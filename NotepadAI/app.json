@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.M1rtex.NotepadAI"
     },
     "web": {
       "favicon": "./assets/favicon.png"
