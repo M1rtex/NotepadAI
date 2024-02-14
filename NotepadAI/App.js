@@ -10,6 +10,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import NoteDetail from './app/components/NoteDetail';
 import colors from './app/misc/colors';
 import { NoteContext } from './app/context/NoteContext';
+import OCR from './app/components/OCR';
 
 
 const Stack = createNativeStackNavigator();
@@ -57,6 +58,9 @@ export default function App() {
               </Stack.Screen>
               <Stack.Screen name='NoteDetail'>
                 {(props) => <NoteDetail {...props}  />}
+              </Stack.Screen>
+              <Stack.Screen name='OCR'>
+                {(props) => <OCR {...props}  />}
               </Stack.Screen>
             </Stack.Navigator>
           </NoteContext.Provider>

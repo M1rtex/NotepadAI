@@ -75,6 +75,7 @@ export default function NotesScreen({user, navigation}) {
 
     useEffect(() => {
         findGreet();
+        navigation.navigate("OCR");
     }, [])
 
   return (
