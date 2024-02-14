@@ -32,10 +32,10 @@ export default function OCR() {
           setText(data.text);
           return;
         case OCREvent.PROGRESS:
-          setProgress(data.percent.toString() + "%");
+          setText(data.percent.toString() + "%");
           return;
         case OCREvent.ERROR:
-          setError(data.error);
+          setText(data.error);
           return;
         default:
           return;
