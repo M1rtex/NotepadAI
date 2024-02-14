@@ -10,8 +10,13 @@ export default function OCR() {
 
     const getText = async () => {
       let resultFromUri = await MlkitOcr.detectFromUri(image);
-      console.log(resultFromUri[0].text)
-      setText(resultFromUri[0].text)
+      console.log(resultFromUri)
+      let text_ = ""
+      resultFromUri.forEach((bounding) => {
+        text_ += bounding.text + "\n"
+      })
+      console.log(text_)
+      setText(text_)
     }
 
     const pickImage = async () => {
