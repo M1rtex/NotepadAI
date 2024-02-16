@@ -1,6 +1,5 @@
 
 import { StyleSheet } from 'react-native';
-import { createContext } from 'react';
 import Intro from './app/screens/Intro';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,6 +9,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import NoteDetail from './app/components/NoteDetail';
 import colors from './app/misc/colors';
 import { NoteContext } from './app/context/NoteContext';
+import OCR from './app/components/OCR';
+import AIScreen from './app/screens/AIScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -18,7 +19,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
       const [user, setUser] = useState({});
       const [isAppFirstTimeOpen, setIsAppFirstTimeOpen] = useState(false);
-
+      const [headerShown, SetHeaderShown] = useState(true);
       const [notes, setNotes] = useState([]);
 
       const findNotes = async () => {
@@ -44,6 +45,7 @@ export default function App() {
       useEffect(() => {
         findUser();
         findNotes();
+        SetHeaderShown(false);
       }, []);
 
       if (isAppFirstTimeOpen) return <Intro onComplete={findUser} />;
@@ -57,6 +59,12 @@ export default function App() {
               </Stack.Screen>
               <Stack.Screen name='NoteDetail'>
                 {(props) => <NoteDetail {...props}  />}
+              </Stack.Screen>
+              <Stack.Screen name='OCR'>
+                {(props) => <OCR {...props}  />}
+              </Stack.Screen>
+              <Stack.Screen name='AIScreen'>
+                {(props) => <AIScreen {...props}  />}
               </Stack.Screen>
             </Stack.Navigator>
           </NoteContext.Provider>

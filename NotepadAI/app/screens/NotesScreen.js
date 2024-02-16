@@ -69,6 +69,10 @@ export default function NotesScreen({user, navigation}) {
         await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes))
     }
 
+    const openAIScreen = () => {
+        navigation.navigate('AIScreen')
+    }
+
     const openNote = (note) => {
         navigation.navigate('NoteDetail', {note})
     }
@@ -84,7 +88,7 @@ export default function NotesScreen({user, navigation}) {
         <View style={styles.container}>
             <View style={styles.interactiveBar}>
                 <RoundIconBtn IconName='list' size={20} />
-                <RoundIconBtn IconName='person' size={20} />
+                <RoundIconBtn IconName='brain' size={20} onPress={openAIScreen} />
             </View>
             <View style={styles.userBar}>
                 <Text style={[styles.header, styles.text]}>{`Добр${greet}, ${user.name}!`}</Text>
@@ -168,5 +172,6 @@ const styles = StyleSheet.create({
     interactiveBar: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        marginTop: 40
     },
 });

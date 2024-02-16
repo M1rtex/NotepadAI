@@ -2,10 +2,12 @@ import { Modal, StyleSheet, Text, View, StatusBar, TextInput, TouchableWithoutFe
 import React, { useEffect, useState } from 'react'
 import colors from '../misc/colors'
 import RoundIconBtn from './RoundIconBtn'
+import OCR from './OCR'
 
 export default function NoteInputModal({visible, onClose, onSubmit, isEdit, note}) {
     const [title, setTitle] = useState('')
     const [desc, setDesc] = useState('')
+    const [image, setImage] = useState(null);
 
 
     const onCloseModal= () => {
@@ -15,7 +17,6 @@ export default function NoteInputModal({visible, onClose, onSubmit, isEdit, note
         }
         onClose();
     }
-
 
     const onConfirm = () => {
         if (!title.trim() && !desc.trim()) return onClose();
@@ -29,6 +30,12 @@ export default function NoteInputModal({visible, onClose, onSubmit, isEdit, note
         }
         onClose();
       };
+
+    const onOCR = (text, language) => {
+        setTitle(language + ": " + title)
+        setDesc(desc + "\n" + text)
+        console.log("Text addeed")
+    }
 
 
     useEffect(() => {
@@ -45,7 +52,10 @@ export default function NoteInputModal({visible, onClose, onSubmit, isEdit, note
         <View style={styles.container} >
             <View style={styles.statusBtns}>
                 <RoundIconBtn IconName='arrow-left' size={20} onPress={onCloseModal} />
-                <RoundIconBtn IconName='check' size={20} onPress={onConfirm} />
+                <View style={styles.statusBtns} >
+                    <OCR onResult={onOCR}/>
+                    <RoundIconBtn IconName='check' size={20} onPress={onConfirm} />
+                </View>
             </View>
             <TextInput value={title} placeholder='Название' style={[styles.input, styles.title]} onChangeText={(text) => {setTitle(text)}} />
             <TextInput value={desc} multiline placeholder='Заметка' style={[styles.input, styles.desc]} onChangeText={(text) => {setDesc(text)}} />

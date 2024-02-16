@@ -5,7 +5,10 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "ANDROID_HOME": "/home/m1rtex/Android/Sdk"
+      }
     },
     "preview": {
       "distribution": "internal"

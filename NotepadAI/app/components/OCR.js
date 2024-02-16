@@ -1,38 +1,39 @@
-import { StyleSheet, Text, View, TouchableOpacity, ToastAndroid, ActivityIndicator } from 'react-native'
-import React, {useState, useEffect} from 'react'
+import { StyleSheet, ToastAndroid } from 'react-native'
+import React, {useState} from 'react'
 import callGoogleVisionAsync from './GoogleVision.js';
 import * as ImagePicker from 'expo-image-picker';
+import RoundIconBtn from './RoundIconBtn.js';
 
-export default function OCR() {
+export default function OCR({onResult}) {
     const [language, setLanguage] = useState(null);
-    const [subtitle, setSubtitle] = useState(null);
-    const [loading, SetLoading] = useState(false);
+    const [text, setText] = useState(null);
 
-    const getText = async () => {
-        callGoogleVisionAsync(image).then(data=>{
-        let text = ""
-        let locale = null
-        data.responses.forEach((response)=>{
-            response.textAnnotations.forEach((textAnnotation)=>{
-            text = text +" "+ textAnnotation.description;
-            if(locale===null){
-                locale = textAnnotation.locale
+    const getText = async (image) => {
+        let resp = null
+        await callGoogleVisionAsync(image).then(data=>{
+        var txt = ""
+        var locale = ""
+        data.responses.forEach((response) => {
+            if (response.fullTextAnnotation) {
+                txt = response.fullTextAnnotation.text;
+                locale = response.textAnnotations[0].locale;
+                console.log(locale, txt);
             }
-            })
-        })
-        setLanguage(locale)
-        setSubtitle(text)
-        SetLoading(false)
+        });
+        setLanguage(locale);
+        setText(txt);
+        console.log(language, text);
+        resp = {"text": txt, "locale": locale}
         }).catch((error)=>{
         ToastAndroid.showWithGravity(
             'Error',
             ToastAndroid.SHORT,
             ToastAndroid.CENTER,
         );
-        SetLoading(false)
+        console.error(error)
         })
+        return resp
     }
-    
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -42,62 +43,32 @@ export default function OCR() {
           base64: true
         });
     
-        console.log(result.assets);
-    
         if (!result.canceled) {
-          setImage(result.assets[0].base64);
+          return result.assets[0].base64
         }
+        return null
       };
+
+    const onRequest = async () => {
+        await pickImage().then( async (image) => {
+            if (image) {
+                await getText(image).then((data) => {
+                    console.log(data)
+                    if (data) {
+                        onResult(data.text, data.locale)
+                    }
+                })
+            }
+            setText(null)
+            setLanguage(null)
+        })
+        
+    }
     
   return (
-    <View>
-      <Text style={styles.title}>OCR</Text>
-      <View>
-        <TouchableOpacity style={styles.button} onPress={SelectPhoto}>
-        <Text style={styles.buttonText}>Pick a Photo</Text>
-        </TouchableOpacity>
-          {
-            (loading===false)?
-             (subtitle!==null)?
-                <View>
-                  <Text style={styles.languagetitle}>{language}</Text>
-                  <Text style={styles.subtitle}>{subtitle}</Text>
-                </View>:<></>
-              :<ActivityIndicator size="large" />
-            
-          }
-      </View>
-    </View>
+    <RoundIconBtn IconName="photo-film" size={18} onPress={onRequest} />
   )
 
 }
 
-const styles = StyleSheet.create({
-    title: {
-        fontSize: 35,
-        marginVertical: 40,
-      },
-    subtitle: {
-        fontSize: 20,
-        marginVertical: 10,
-        textAlign:'center'
-      },
-    languagetitle: {
-        fontSize: 30,
-        marginVertical: 10,
-        textAlign:'center'  
-      },
-    button: {
-        backgroundColor: '#47477b',
-        color: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 15,
-        paddingHorizontal: 40,
-        borderRadius: 50,
-        marginTop: 20,
-      },
-    buttonText: {
-        color: '#fff',
-      },
-})
+const styles = StyleSheet.create({})
