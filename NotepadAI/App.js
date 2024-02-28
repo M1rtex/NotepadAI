@@ -1,5 +1,5 @@
 
-import { StyleSheet } from 'react-native';
+import { StyleSheet, LogBox } from 'react-native';
 import Intro from './app/screens/Intro';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,6 +11,8 @@ import colors from './app/misc/colors';
 import { NoteContext } from './app/context/NoteContext';
 import OCR from './app/components/OCR';
 import AIScreen from './app/screens/AIScreen';
+import NoteInputScreen from './app/screens/NoteInputScreen';
+import SettingsScreen from './app/screens/SettingsScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -36,12 +38,6 @@ export default function App() {
         setIsAppFirstTimeOpen(false);
       };
 
-      const onSubmit = async (note) => {
-        const updatedNotes = [...notes, note];
-        setNotes(updatedNotes);
-        await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes))
-      }
-
       useEffect(() => {
         findUser();
         findNotes();
@@ -53,9 +49,9 @@ export default function App() {
     return (
         <NavigationContainer>
           <NoteContext.Provider value={{notes, setNotes, findNotes}}>
-            <Stack.Navigator screenOptions={{headerTitle: '', headerTransparent: true}}>
+            <Stack.Navigator cardStyle={{backgroundColor: colors.LIGHT}} screenOptions={{headerTitle: '', headerTransparent: true, headerShown: false}}>
               <Stack.Screen name='NotesScreen'>
-                {(props) => <NotesScreen {...props} notes={notes} user={user} onSubmit={onSubmit} />}
+                {(props) => <NotesScreen {...props} user={user} />}
               </Stack.Screen>
               <Stack.Screen name='NoteDetail'>
                 {(props) => <NoteDetail {...props}  />}
@@ -65,6 +61,12 @@ export default function App() {
               </Stack.Screen>
               <Stack.Screen name='AIScreen'>
                 {(props) => <AIScreen {...props}  />}
+              </Stack.Screen>
+              <Stack.Screen name='NoteInputScreen'>
+                {(props) => <NoteInputScreen {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name='Settings'>
+                {(props) => <SettingsScreen {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </NoteContext.Provider>

@@ -1,8 +1,9 @@
-import { StyleSheet, ToastAndroid } from 'react-native'
+import { StyleSheet, ToastAndroid, View } from 'react-native'
 import React, {useState} from 'react'
 import callGoogleVisionAsync from './GoogleVision.js';
 import * as ImagePicker from 'expo-image-picker';
-import RoundIconBtn from './RoundIconBtn.js';
+import IconView from './Icon.js';
+import colors from '../misc/colors.js';
 
 export default function OCR({onResult}) {
     const [language, setLanguage] = useState(null);
@@ -66,9 +67,15 @@ export default function OCR({onResult}) {
     }
     
   return (
-    <RoundIconBtn IconName="photo-film" size={18} onPress={onRequest} />
+    <View style={styles.container}>
+      <IconView IconName="photo-film" type="FontAwesome6" size={28} onPress={onRequest} />
+    </View>
   )
 
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: 'center',
+  }
+})
