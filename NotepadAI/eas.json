@@ -13,7 +13,12 @@
     "preview": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "distribution": "internal",
+      "env": {
+        "ANDROID_HOME": "/home/m1rtex/Android/Sdk"
+      }
+    }
   },
   "submit": {
     "production": {}

@@ -8,6 +8,7 @@ import IconView from '../components/Icon'
 import BackButton from '../components/BackButton'
 import AIChooseModal from '../components/AIChooseModal'
 import ExtraMenuModal from '../components/ExtraMenuModal'
+import TranslateSelectorModal from '../components/TranslateSelectorModal'
 
 const formatNum = (num) => {
     if (num.toString().length < 2) {
@@ -27,6 +28,13 @@ export default function NoteInputScreen(props) {
     const [extraModal, setExtraModal] = useState(false)
 
     const navigation = props.navigation;
+
+    const handleOnAIans = (ans) => {
+        let newDesc = `${desc}
+[Ответ AI]
+${ans}`
+        setDesc(newDesc)
+    }
 
     const formatTime = time => {
         const date = new Date(time);
@@ -96,7 +104,7 @@ export default function NoteInputScreen(props) {
         console.log("Text addeed")
     }
 
-    const toggleIModal = () => {
+    const toggleAIModal = () => {
         setAIModal(!AIModal)
     }
 
@@ -114,6 +122,7 @@ export default function NoteInputScreen(props) {
             setDesc(note.desc);
         }
       }, []);
+
 
   return (
   <>
@@ -140,15 +149,15 @@ export default function NoteInputScreen(props) {
         </View>
         <View style={styles.btns_block}>
             <View style={styles.btn_squere}>
-                <IconView IconName="wand-magic-sparkles" type="FontAwesome6" onPress={toggleIModal} />
+                <IconView IconName="wand-magic-sparkles" type="FontAwesome6" onPress={toggleAIModal} />
             </View>
             <View style={[styles.btn_squere, {backgroundColor: colors.PURPLE}]}>
                 <IconView IconName="ellipsis-h" type="FontAwesome5" style={{color: colors.WHITE_LIGHT}} onPress={toggleExtraModal}/>
             </View>
         </View>
     </KeyboardAvoidingView>
-    <AIChooseModal visible={AIModal} onClose={toggleIModal}/>
-    <ExtraMenuModal visible={extraModal} color={color} onDelete={displayDeleteAlert} onChangeColor={handleColorChange} onClose={toggleExtraModal}/>
+    <AIChooseModal visible={AIModal} onClose={toggleAIModal} noteDesc={desc} onSubmit={handleOnAIans} />
+    <ExtraMenuModal visible={extraModal} color={color} onDelete={(isEdit) ?  displayDeleteAlert : () => {}} onChangeColor={handleColorChange} onClose={toggleExtraModal}/>
   </>
   )
 }

@@ -56,12 +56,6 @@ export default function App() {
               <Stack.Screen name='NoteDetail'>
                 {(props) => <NoteDetail {...props}  />}
               </Stack.Screen>
-              <Stack.Screen name='OCR'>
-                {(props) => <OCR {...props}  />}
-              </Stack.Screen>
-              <Stack.Screen name='AIScreen'>
-                {(props) => <AIScreen {...props}  />}
-              </Stack.Screen>
               <Stack.Screen name='NoteInputScreen'>
                 {(props) => <NoteInputScreen {...props} />}
               </Stack.Screen>
