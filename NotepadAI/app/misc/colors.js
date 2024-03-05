@@ -1,11 +1,29 @@
 export default {
     DARK: '#1e1e1e',
     TEXT: '#5e5e5e',
-    LIGHT: '#FFF',
+    LIGHT: '#FFFFFF',
     PRIMARY: '#f74f4f',
     PEACH: '#f4b158',
     PINK: '#f4768e',
     BLUE: '#0184de',
     ERROR: '#ff0000',
-    SEARCH: '#f0f0f0'
+    RED:'#CE3A54',
+    SEARCH: '#f0f0f0',
+    PLACEHOLDER: '#C8C5CB',
+    PURPLE: '#6a3ea1',
+    RED_LIGHT: '#F0C6CE',
+    WHITE_LIGHT: '#FFFFFF',
+    PURPLE_LIGHT: '#EBDDFD',
+    GREEN_LIGHT: '#BCF4CF',
+    YELLOW_LIGHT: '#FDEBAB',
+
+    LIGHT_TIME: '#EFEEF0',
+    YELLOW_TIME: '#F8C715',
+    YELLOW_CARD: '#FDEBAB',
+    RED_CARD: '#F7DEE3',
+    RED_TIME: '#CE3A54',
+    PURPLE_CARD: '#EFE9F7',
+    PURPLE_TIME: '#6A3EA1',
+    GREEN_CARD: '#DAF6E4',
+    GREEN_TIME: '#60D889'
 }

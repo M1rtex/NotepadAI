@@ -1,0 +1,26 @@
+{
+  "cli": {
+    "version": ">= 7.2.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "ANDROID_HOME": "/home/m1rtex/Android/Sdk"
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "distribution": "internal",
+      "env": {
+        "ANDROID_HOME": "/home/m1rtex/Android/Sdk"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

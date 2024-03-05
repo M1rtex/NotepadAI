@@ -1,11 +1,13 @@
-import { Modal, StyleSheet, Text, View, StatusBar, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { Modal, StyleSheet, Text, View, StatusBar, TextInput, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import colors from '../misc/colors'
 import RoundIconBtn from './RoundIconBtn'
+import OCR from './OCR'
 
 export default function NoteInputModal({visible, onClose, onSubmit, isEdit, note}) {
     const [title, setTitle] = useState('')
     const [desc, setDesc] = useState('')
+    const [image, setImage] = useState(null);
 
 
     const onCloseModal= () => {
@@ -15,7 +17,6 @@ export default function NoteInputModal({visible, onClose, onSubmit, isEdit, note
         }
         onClose();
     }
-
 
     const onConfirm = () => {
         if (!title.trim() && !desc.trim()) return onClose();
@@ -30,6 +31,12 @@ export default function NoteInputModal({visible, onClose, onSubmit, isEdit, note
         onClose();
       };
 
+    const onOCR = (text, language) => {
+        setTitle(language + ": " + title)
+        setDesc(desc + "\n" + text)
+        console.log("Text addeed")
+    }
+
 
     useEffect(() => {
         if (isEdit) {
@@ -41,18 +48,21 @@ export default function NoteInputModal({visible, onClose, onSubmit, isEdit, note
   return (
   <>
     <Modal visible={visible} animationType='slide'>
-        
-        <View style={styles.container} >
-            <View style={styles.statusBtns}>
-                <RoundIconBtn IconName='arrow-left' size={20} onPress={onCloseModal} />
-                <RoundIconBtn IconName='check' size={20} onPress={onConfirm} />
-            </View>
-            <TextInput value={title} placeholder='Название' style={[styles.input, styles.title]} onChangeText={(text) => {setTitle(text)}} />
-            <TextInput value={desc} multiline placeholder='Заметка' style={[styles.input, styles.desc]} onChangeText={(text) => {setDesc(text)}} />
-        </View>
+    <KeyboardAvoidingView behavior='height' style={styles.container} >
         <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
-            <View style={[styles.modalBG, StyleSheet.absoluteFillObject]} />
+            <View>
+                <View style={styles.statusBtns}>
+                    <RoundIconBtn IconName='arrow-left' size={20} onPress={onCloseModal} />
+                    <View style={styles.statusBtns} >
+                        <OCR onResult={onOCR}/>
+                        <RoundIconBtn IconName='check' size={20} onPress={onConfirm} />
+                    </View>
+                </View>
+                <TextInput value={title} placeholder='Название' style={[styles.input, styles.title]} onChangeText={(text) => {setTitle(text)}} />
+                <TextInput value={desc} multiline placeholder='Заметка' style={[styles.input, styles.desc]} onChangeText={(text) => {setDesc(text)}} />
+                </View>
         </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
     </Modal>
   </>
   )
@@ -64,6 +74,7 @@ const styles = StyleSheet.create({
         color: colors.DARK
     },
     container: {
+        flex: 1,
         paddingHorizontal: 20,
     },
     title: {

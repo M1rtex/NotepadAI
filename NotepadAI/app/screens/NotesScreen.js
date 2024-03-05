@@ -4,10 +4,10 @@ import colors from '../misc/colors'
 import SearchBar from '../components/SearchBar'
 import RoundIconBtn from '../components/RoundIconBtn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import NoteInputModal from '../components/NoteInputModal'
 import Note from '../components/note'
 import { useNotes } from '../context/NoteContext'
 import NotFound from '../components/NotFound'
+import IconView from '../components/Icon'
 
 const reverseData = data => {
     return data.sort((a, b) => {
@@ -19,9 +19,8 @@ const reverseData = data => {
     });
   };
 
-export default function NotesScreen({user, navigation}) {
+export default function NotesScreen({user, navigation, route}) {
     const [greet, setGreet] = useState("")
-    const [modalVisible, setModalVisible] = useState(false)
     const {notes, setNotes, findNotes} = useNotes()
     const [searchQuery, setSearchQuery] = useState('');
     const [resultNotFound, setResultNotFound] = useState(false)
@@ -54,16 +53,14 @@ export default function NotesScreen({user, navigation}) {
       };
 
     
-    const reversedNotes = reverseData(notes);
-
     const handleOnClear = async () => {
         setSearchQuery('');
         setResultNotFound(false);
         await findNotes();
       };
 
-    const handleOnSubmit = async (title, desc) => { 
-        const note = {id: Date.now(), time: Date.now(), title, desc};
+    const handleOnSubmit = async (title, desc, color) => { 
+        const note = {id: Date.now(), time: Date.now(), title, desc, color};
         const updatedNotes = [...notes, note];
         setNotes(updatedNotes);
         await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes))
@@ -72,6 +69,17 @@ export default function NotesScreen({user, navigation}) {
     const openNote = (note) => {
         navigation.navigate('NoteDetail', {note})
     }
+
+
+    useEffect(() => {
+        if (route.params?.post) {
+            let title = route.params.post.title;
+            let desc = route.params.post.desc;
+            let color = route.params.post.color;
+            handleOnSubmit(title, desc, color);
+        }
+      }, [route.params?.post]);
+
 
     useEffect(() => {
         findGreet();
@@ -82,13 +90,12 @@ export default function NotesScreen({user, navigation}) {
         <StatusBar barStyle='dark-content' backgroundColor={colors.LIGHT} />
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-            <View style={styles.interactiveBar}>
-                <RoundIconBtn IconName='list' size={20} />
-                <RoundIconBtn IconName='person' size={20} />
-            </View>
             <View style={styles.userBar}>
                 <Text style={[styles.header, styles.text]}>{`Добр${greet}, ${user.name}!`}</Text>
-                <RoundIconBtn IconName="user-minus" size={12} style={styles.deleteBtn} onPress={async () => {await AsyncStorage.clear(); console.log("Storage cleared")}} />
+                {/* <RoundIconBtn IconName="user-minus" size={12} style={styles.deleteBtn} onPress={async () => {await AsyncStorage.clear(); console.log("Storage cleared")}} /> */}
+                <View style={styles.settingBtn}>
+                    <IconView IconName='setting' type='AntDesign' size={28} onPress={() => {navigation.navigate('Settings')}}/>
+                </View>
             </View>
             {(notes.length) ? 
                 <SearchBar value={searchQuery}
@@ -101,7 +108,7 @@ export default function NotesScreen({user, navigation}) {
             {resultNotFound ? <NotFound/> : 
             <FlatList 
                 numColumns={2} 
-                data={reversedNotes}
+                data={reverseData(notes)}
                 columnWrapperStyle={{justifyContent: 'space-between', marginBottom: 15, padding: 2}}
                 keyExtractor={item => item.id.toString()} 
                 renderItem={({item}) => <Note onPress={() => {openNote(item)}} item={item}/>}
@@ -114,8 +121,7 @@ export default function NotesScreen({user, navigation}) {
             : null}
         </View>
         </TouchableWithoutFeedback>
-        <RoundIconBtn IconName="plus" style={styles.addBtn} onPress={() => setModalVisible(true)}/>
-        <NoteInputModal visible={modalVisible} onClose={() => setModalVisible(false)} onSubmit={handleOnSubmit}/>
+        <RoundIconBtn IconName="plus" style={styles.addBtn} onPress={() => {navigation.navigate("NoteInputScreen", {})}}/>
     </>
   )
 }
@@ -130,8 +136,9 @@ const styles = StyleSheet.create({
         backgroundColor: colors.LIGHT
     },
     header: {
-        fontSize: 28,
-        fontWeight: 'bold'
+        fontSize: 24,
+        fontWeight: 'bold',
+        opacity: 0.9
     },
     text: {
         color: colors.TEXT
@@ -152,10 +159,13 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 15,
         bottom: 50,
-        zIndex: 1
+        zIndex: 1,
+        color: colors.LIGHT
     },
     userBar: {
+        paddingTop: 10,
         flexDirection: 'row',
+        justifyContent: 'space-between'
     },
     deleteBtn: {
         marginLeft: 5,
@@ -165,8 +175,7 @@ const styles = StyleSheet.create({
     search: {
         marginVertical: 15,
     },
-    interactiveBar: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
+    settingBtn: {
+        justifyContent: 'center'
+    }
 });

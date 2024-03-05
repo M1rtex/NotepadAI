@@ -1,11 +1,11 @@
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHeaderHeight } from '@react-navigation/elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import colors from '../misc/colors';
-import RoundIconBtn from './RoundIconBtn';
 import { useNotes } from '../context/NoteContext';
-import NoteInputModal from './NoteInputModal';
+import IconView from '../components/Icon'
+import BackButton from '../components/BackButton'
 
 const formatNum = (num) => {
     if (num.toString().length < 2) {
@@ -18,10 +18,10 @@ const formatNum = (num) => {
 export default function NoteDetail(props) {
     const [note, setNote] = useState(props.route.params.note);
     const {setNotes, findNotes} = useNotes()
-    const [showModal, setShowModal] = useState(false)
-    const [isEdit, setIsEdit] = useState(false);
 
     const headerHeight = useHeaderHeight()
+
+    const navigation = props.navigation;
 
     const formatTime = time => {
         const date = new Date(time);
@@ -62,7 +62,7 @@ export default function NoteDetail(props) {
         ], {cancelable: true})
     }
 
-    const handleOnSubmit = async (title, desc, time) => {
+    const handleOnSubmit = async (title, desc, time, color) => {
         const result = await AsyncStorage.getItem('notes');
         let notes = [];
         if (result !== null) notes = JSON.parse(result);
@@ -73,7 +73,7 @@ export default function NoteDetail(props) {
             n.desc = desc;
             n.isUpdated = true;
             n.time = time;
-    
+            n.color = color
             setNote(n);
           }
           return n;
@@ -84,25 +84,43 @@ export default function NoteDetail(props) {
       };
 
 
-      const handleOnClose = () => setShowModal(false);
     
       const openEditModal = () => {
-        setIsEdit(true);
-        setShowModal(true);
+        props.navigation.navigate("NoteInputScreen", {isEdit: true, note: note});
       };
+
+      useEffect(() => {
+        if (props.route.params?.post) {
+            let title = props.route.params.post.title;
+            let desc = props.route.params.post.desc;
+            let time = props.route.params.post.time;
+            let color = props.route.params.post.color;
+            handleOnSubmit(title, desc, time, color);
+        }
+      }, [props.route.params?.post]);
 
     return (
         <>
-        <ScrollView contentContainerStyle={[styles.container, {marginTop: headerHeight}]}>
-            <Text style={styles.time}>{formatTime(note.time)}</Text>
+        <ScrollView style={{backgroundColor: colors.LIGHT}} contentContainerStyle={[styles.container, {marginTop: headerHeight}]}>
+            <View style={[styles.statusBtns, {paddingBottom: 21, paddingTop: 16}]}>
+                <BackButton onPress={() => {navigation.goBack()}}/>
+            </View>
             <Text style={[styles.title, styles.text]}>{note.title}</Text>
             <Text style={[styles.desc, styles.text]}>{note.desc}</Text>
         </ScrollView>
-        <View style={styles.btnsContainer}>
-                <RoundIconBtn IconName="trash-can" onPress={displayDeleteAlert} style={{backgroundColor: colors.ERROR, marginBottom: 15}}/>
-                <RoundIconBtn IconName="pen" onPress={openEditModal}/>
+        <View style={styles.task_bar}>
+            <View style={styles.time_block}>
+            <Text style={styles.time}>{(note) ? formatTime(note.time) : 'Новая заметка'}</Text>
+            </View>
+            <View style={styles.btns_block}>
+                <View style={[styles.btn_squere]}>
+                    <IconView IconName="pen" type="FontAwesome5"  onPress={openEditModal}/>
+                </View>
+                <View style={[styles.btn_squere, {backgroundColor: colors.PURPLE}]}>
+                    <IconView IconName="trash-alt" type="FontAwesome5" style={{color: colors.WHITE_LIGHT}} onPress={displayDeleteAlert}/>
+                </View>
+            </View>
         </View>
-        <NoteInputModal isEdit={isEdit} note={note} onClose={handleOnClose} visible={showModal} onSubmit={handleOnSubmit} />
         </>
     )
 }
@@ -110,9 +128,10 @@ export default function NoteDetail(props) {
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 15,
+        backgroundColor: colors.LIGHT
     },
     text: {
-        color: colors.TEXT
+        color: colors.DARK
     },
     title: {
         fontSize: 30,
@@ -130,5 +149,26 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 50,
         right: 15,
-    }
+    },
+    task_bar: {
+        height: 48,
+        width: "100%",
+        paddingHorizontal: 0,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        backgroundColor: colors.LIGHT,
+    },
+    time_block: {
+        justifyContent: "center",
+        paddingLeft: 15,
+    },
+    btns_block: {
+        width: 96,
+        flexDirection: 'row',
+    },
+    btn_squere: {
+        width: 48,
+        paddingHorizontal: 13,
+        justifyContent: 'center',
+    },
 })

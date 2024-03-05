@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingLeft: 15,
         paddingVertical: 5,
-        fontSize: 25,
+        fontSize: 15,
         backgroundColor: colors.SEARCH,
     },
     container: {
@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     },
     clearIcon: {
       position: 'absolute',
-      right: 10
+      right: 10,
+      top: 8
     }
 })
