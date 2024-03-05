@@ -1,4 +1,3 @@
-
 import { StyleSheet, LogBox } from 'react-native';
 import Intro from './app/screens/Intro';
 import { useEffect, useState } from 'react';
