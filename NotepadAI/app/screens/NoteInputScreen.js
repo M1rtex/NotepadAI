@@ -8,6 +8,8 @@ import IconView from '../components/Icon'
 import BackButton from '../components/BackButton'
 import AIChooseModal from '../components/AIChooseModal'
 import ExtraMenuModal from '../components/ExtraMenuModal'
+import TranslateSelectorModal from '../components/TranslateSelectorModal'
+import LoadingModal from '../components/LoadingModal'
 
 const formatNum = (num) => {
     if (num.toString().length < 2) {
@@ -22,11 +24,19 @@ export default function NoteInputScreen(props) {
     const [isEdit, setIsEdit] = useState(props.route.params.isEdit);
     const [note, setNote] = useState(props.route.params.note);
     const [color, setColor] = useState((isEdit) ? note.color : 'white');
-    const {notes, setNotes, findNotes} = useNotes()
-    const [AIModal, setAIModal] = useState(false)
-    const [extraModal, setExtraModal] = useState(false)
+    const {notes, setNotes, findNotes} = useNotes();
+    const [AIModal, setAIModal] = useState(false);
+    const [extraModal, setExtraModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [loadingType, setLoadingType] = useState('AI');
 
     const navigation = props.navigation;
+
+    const handleOnAIans = (ans, request) => {
+        let newDesc = desc + "\n[Ответ AI]\n" + ans;
+        if (title.trim().length === 0 && request) setTitle(request);
+        setDesc(newDesc);
+    }
 
     const formatTime = time => {
         const date = new Date(time);
@@ -91,12 +101,11 @@ export default function NoteInputScreen(props) {
       };
 
     const onOCR = (text, language) => {
-        setTitle(language + ": " + title)
-        setDesc(desc + "\n" + text)
+        setDesc(desc + `\n[OCR:${language}]\n` + text)
         console.log("Text addeed")
     }
 
-    const toggleIModal = () => {
+    const toggleAIModal = () => {
         setAIModal(!AIModal)
     }
 
@@ -115,6 +124,7 @@ export default function NoteInputScreen(props) {
         }
       }, []);
 
+
   return (
   <>
     <KeyboardAvoidingView style={styles.container}>
@@ -123,7 +133,7 @@ export default function NoteInputScreen(props) {
                 <View style={[styles.statusBtns, {paddingBottom: 21, paddingTop: 16}]}>
                     <BackButton onPress={onClose}/>
                     <View style={styles.statusBtns} >
-                        <OCR onResult={onOCR}/>
+                        <OCR onResult={onOCR} setLoading={setIsLoading} setLoadingType={setLoadingType}/>
                         <IconView IconName='check' type='FontAwesome6' size={27} onPress={onConfirm} style={{paddingLeft: 15}} />
                     </View>
                 </View>
@@ -140,15 +150,16 @@ export default function NoteInputScreen(props) {
         </View>
         <View style={styles.btns_block}>
             <View style={styles.btn_squere}>
-                <IconView IconName="wand-magic-sparkles" type="FontAwesome6" onPress={toggleIModal} />
+                <IconView IconName="wand-magic-sparkles" type="FontAwesome6" onPress={toggleAIModal} />
             </View>
             <View style={[styles.btn_squere, {backgroundColor: colors.PURPLE}]}>
                 <IconView IconName="ellipsis-h" type="FontAwesome5" style={{color: colors.WHITE_LIGHT}} onPress={toggleExtraModal}/>
             </View>
         </View>
     </KeyboardAvoidingView>
-    <AIChooseModal visible={AIModal} onClose={toggleIModal}/>
-    <ExtraMenuModal visible={extraModal} color={color} onDelete={displayDeleteAlert} onChangeColor={handleColorChange} onClose={toggleExtraModal}/>
+    <AIChooseModal visible={AIModal} onClose={toggleAIModal} noteDesc={desc} onSubmit={handleOnAIans} setLoading={setIsLoading} setLoadingType={setLoadingType} />
+    <ExtraMenuModal visible={extraModal} color={color} onDelete={(isEdit) ?  displayDeleteAlert : () => {}} onChangeColor={handleColorChange} onClose={toggleExtraModal}/>
+    <LoadingModal visible={isLoading} type={loadingType}/>
   </>
   )
 }

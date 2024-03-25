@@ -1,18 +1,17 @@
 
-import { StyleSheet, LogBox } from 'react-native';
+import { StyleSheet, useColorScheme } from 'react-native';
 import Intro from './app/screens/Intro';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NotesScreen from './app/screens/NotesScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import NoteDetail from './app/components/NoteDetail';
+import NoteDetail from './app/screens/NoteDetail';
 import colors from './app/misc/colors';
 import { NoteContext } from './app/context/NoteContext';
-import OCR from './app/components/OCR';
-import AIScreen from './app/screens/AIScreen';
 import NoteInputScreen from './app/screens/NoteInputScreen';
 import SettingsScreen from './app/screens/SettingsScreen';
+import SplashScreen from './app/screens/SplashScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -20,9 +19,11 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
       const [user, setUser] = useState({});
-      const [isAppFirstTimeOpen, setIsAppFirstTimeOpen] = useState(false);
-      const [headerShown, SetHeaderShown] = useState(true);
+      const [isAppFirstTimeOpen, setIsAppFirstTimeOpen] = useState(true);
       const [notes, setNotes] = useState([]);
+      const them = (useColorScheme() != null) ? useColorScheme() : 'light'
+      // console.log("[PREF_THEME]" + useColorScheme())
+      const [theme, setTheme] = useState(them);
 
       const findNotes = async () => {
         const result = await AsyncStorage.getItem('notes');
@@ -31,36 +32,32 @@ export default function App() {
 
       const findUser = async () => {
         const result = await AsyncStorage.getItem('user');
-        if (result === null) {
-          return setIsAppFirstTimeOpen(true)
+        if (result) {
+          
+          setUser(JSON.parse(result));
         };
-        setUser(JSON.parse(result));
-        setIsAppFirstTimeOpen(false);
       };
 
       useEffect(() => {
         findUser();
         findNotes();
-        SetHeaderShown(false);
       }, []);
-
-      if (isAppFirstTimeOpen) return <Intro onComplete={findUser} />;
 
     return (
         <NavigationContainer>
-          <NoteContext.Provider value={{notes, setNotes, findNotes}}>
-            <Stack.Navigator cardStyle={{backgroundColor: colors.LIGHT}} screenOptions={{headerTitle: '', headerTransparent: true, headerShown: false}}>
+          <NoteContext.Provider value={{notes, setNotes, findNotes, theme, setTheme}}>
+            <Stack.Navigator cardStyle={{backgroundColor: (theme == 'light') ? colors.LIGHT : colors.PRIMARY_DARK}} screenOptions={{headerTitle: '', headerTransparent: true, headerShown: false}}>
+              <Stack.Screen name='SplashScreen'>
+                {(props) => <SplashScreen {...props}/>}
+              </Stack.Screen>
+              <Stack.Screen name='IntroScreen'>
+                {(props) => <Intro {...props} onComplete={findUser} />}
+              </Stack.Screen>
               <Stack.Screen name='NotesScreen'>
                 {(props) => <NotesScreen {...props} user={user} />}
               </Stack.Screen>
               <Stack.Screen name='NoteDetail'>
                 {(props) => <NoteDetail {...props}  />}
-              </Stack.Screen>
-              <Stack.Screen name='OCR'>
-                {(props) => <OCR {...props}  />}
-              </Stack.Screen>
-              <Stack.Screen name='AIScreen'>
-                {(props) => <AIScreen {...props}  />}
               </Stack.Screen>
               <Stack.Screen name='NoteInputScreen'>
                 {(props) => <NoteInputScreen {...props} />}

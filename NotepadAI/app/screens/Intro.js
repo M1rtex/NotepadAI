@@ -11,11 +11,14 @@ export default function Intro({onComplete, navigation}) {
     const handleSubmit = async () => {
         const user = {name: name}
         await AsyncStorage.setItem('user', JSON.stringify(user))
-        if (onComplete) onComplete()
+        if (onComplete) {
+            onComplete();
+            navigation.navigate("NotesScreen");
+        };
+        
     }
   return (
     <>
-        <StatusBar />
         <View style={styles.container}>
             <Text style={styles.inputTitle}>Введите своё имя, чтобы продолжить</Text>
             <TextInput value={name} onChangeText={(text) => setName(text)} placeholder="Введите имя" style={styles.textInput}/>

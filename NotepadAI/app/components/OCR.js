@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import IconView from './Icon.js';
 import colors from '../misc/colors.js';
 
-export default function OCR({onResult}) {
+export default function OCR({onResult, setLoading, setLoadingType}) {
     const [language, setLanguage] = useState(null);
     const [text, setText] = useState(null);
 
@@ -51,12 +51,15 @@ export default function OCR({onResult}) {
       };
 
     const onRequest = async () => {
+      setLoadingType("OCR");
         await pickImage().then( async (image) => {
             if (image) {
+                setLoading(true);
                 await getText(image).then((data) => {
                     console.log(data)
                     if (data) {
                         onResult(data.text, data.locale)
+                        setLoading(false)
                     }
                 })
             }

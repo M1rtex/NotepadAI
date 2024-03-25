@@ -1,58 +1,77 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import colors from '../misc/colors'
 import IconView from './Icon'
+import AIScreen from '../screens/AIScreen'
 
-export default function AIChooseModal({visible, onClose, onSubmit}) {
+export default function AIChooseModal({visible, onClose, onSubmit, noteDesc, setLoading, setLoadingType}) {
     
-    const handleOnPress = (type) => {
-        console.log(type)
+    const [AIModalvisible, setAIModalvisible] = useState(false);
+    const [SySPrompt, setSysPrompt] = useState(``);
+
+
+    const handleOnPress = (SysPrompt) => {
+        setSysPrompt(SysPrompt);
+        setAIModalvisible(!AIModalvisible);
     }
+
+    const toggleModal = () => {
+        setAIModalvisible(!AIModalvisible);
+        setSysPrompt(``);
+        onClose();
+    }
+
 
   return (
     <View style={[styles.box, StyleSheet.absoluteFill]}>
     
-    <Modal visible={visible} animationType='slide' transparent={true}>
+    <Modal visible={visible} animationType='slide' transparent={true} onShow={() => {setLoadingType('AI')}}>
             <TouchableWithoutFeedback onPress={onClose}>
                 <View style={styles.header}/>
             </TouchableWithoutFeedback>
             <View style={styles.modal}>
                 <View style={styles.container}>
-                    <TouchableOpacity onPress={() => {handleOnPress('Func 1')}}>
+                    <TouchableOpacity onPress={() => {handleOnPress("Summarise")}}>
                         <View style={styles.funcBlock}>
                             <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
-                            <Text style={styles.funcText}>Func 1</Text>
+                            <Text style={styles.funcText}>Суммировать текст</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {handleOnPress('Func 2')}}>
+                    <TouchableOpacity onPress={() => {handleOnPress("Normalize")}}>
                         <View style={styles.funcBlock}>
                             <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
-                            <Text style={styles.funcText}>Func 2</Text>
+                            <Text style={styles.funcText}>Нормализировать текст</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {handleOnPress('Func 3')}}>
+                    <TouchableOpacity onPress={() => {handleOnPress("Translate")}}>
                         <View style={styles.funcBlock}>
                             <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
-                            <Text style={styles.funcText}>Func 3</Text>
+                            <Text style={styles.funcText}>Перевод текста</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {handleOnPress('Func 4')}}>
+                    <TouchableOpacity onPress={() => {handleOnPress("Refactor")}}>
                         <View style={styles.funcBlock}>
                             <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
-                            <Text style={styles.funcText}>Func 4</Text>
+                            <Text style={styles.funcText}>Рефакторинг теста</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => {handleOnPress("Generate")}}>
+                        <View style={styles.funcBlock}>
+                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
+                            <Text style={styles.funcText}>Генерация текста</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
             </View>
     </Modal>
-    
+    <AIScreen visible={AIModalvisible} onClose={toggleModal} Prompt={SySPrompt} desc={noteDesc} onSubmit={onSubmit} setLoading={setLoading}/>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
     header: {
-        minHeight: 475,
+        minHeight: 415,
     },
     modal: {
         paddingTop: 1,
