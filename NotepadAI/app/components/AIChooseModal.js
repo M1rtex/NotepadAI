@@ -72,6 +72,7 @@ export default function AIChooseModal({visible, onClose, onSubmit, noteDesc, set
 const styles = StyleSheet.create({
     header: {
         minHeight: 415,
+        minHeight: 415,
     },
     modal: {
         paddingTop: 1,

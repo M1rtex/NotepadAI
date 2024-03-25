@@ -106,6 +106,7 @@ export default function NoteInputScreen(props) {
     }
 
     const toggleAIModal = () => {
+    const toggleAIModal = () => {
         setAIModal(!AIModal)
     }
 
@@ -123,6 +124,7 @@ export default function NoteInputScreen(props) {
             setDesc(note.desc);
         }
       }, []);
+
 
 
   return (
@@ -150,6 +152,7 @@ export default function NoteInputScreen(props) {
         </View>
         <View style={styles.btns_block}>
             <View style={styles.btn_squere}>
+                <IconView IconName="wand-magic-sparkles" type="FontAwesome6" onPress={toggleAIModal} />
                 <IconView IconName="wand-magic-sparkles" type="FontAwesome6" onPress={toggleAIModal} />
             </View>
             <View style={[styles.btn_squere, {backgroundColor: colors.PURPLE}]}>

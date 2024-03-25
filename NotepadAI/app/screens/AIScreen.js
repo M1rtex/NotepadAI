@@ -1,6 +1,11 @@
 import { Modal, TouchableOpacity, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import React, {useEffect, useState} from 'react'
+import { Modal, TouchableOpacity, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import React, {useEffect, useState} from 'react'
 import colors from '../misc/colors'
+import { SelectList } from 'react-native-dropdown-select-list'
+import askAI, {NormalizeTextPrompt, TranslateTextPrompt, RefactorTextPrompt, GenerateTextPrompt, SummariseTextPrompt} from '../components/AI'
+import IconView from '../components/Icon'
 import { SelectList } from 'react-native-dropdown-select-list'
 import askAI, {NormalizeTextPrompt, TranslateTextPrompt, RefactorTextPrompt, GenerateTextPrompt, SummariseTextPrompt} from '../components/AI'
 import IconView from '../components/Icon'
@@ -151,6 +156,32 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit, setL
                 </View>
             </View>
     </Modal>
+    <View style={[styles.box, StyleSheet.absoluteFill]}>
+    
+    <Modal visible={visible} animationType='slide' transparent={true}>
+            <TouchableWithoutFeedback onPress={onExit}>
+                <View style={{minHeight: headerHeight}}/>
+            </TouchableWithoutFeedback>
+            <View style={styles.modal}>
+                <View style={styles.container}>
+                    <Text>{(hintEnable)? "Параметры:" : null}</Text>
+                    {(Prompt == "Normalize" | Prompt == "Summarise") ? <Text style={styles.paramText}>Данные готовы к отправке!</Text>: null}
+                    {(Prompt == "Translate") ? <SelectList search={false} placeholder='Выберите язык' setSelected={(k) => setLang(k)} data={translateChoses} save="key"/>: null}
+                    {(Prompt == "Generate") ? <TextInput placeholder={"Введите тему"} onChangeText={onThemeFieldChange} style={styles.input}/>: null}
+                    {(Prompt == "Refactor") ? <>
+                    <SelectList search={false} placeholder='Выберите тон' setSelected={(v) => setTone(v)} data={tonsChoses} save="value"/>
+                    <SelectList search={false} placeholder='Выберите стиль' setSelected={(v) => setTStyle(v)} data={TstyleChoses} save="value"/>
+                    </>
+                    : null}
+                    <TouchableOpacity onPress={() => {onRequest()}}>
+                        <View style={styles.funcBlock}>
+                            <IconView IconName='paper-plane' size={25} type='FontAwesome5'/>
+                            <Text style={styles.funcText}>Запрос</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            </View>
+    </Modal>
     </View>
   </>
   )
@@ -165,9 +196,21 @@ const styles = StyleSheet.create({
         borderBottomEndRadius: 0,
         backgroundColor: colors.LIGHT
     },
+    modal: {
+        minHeight: 400,
+        borderColor: colors.PLACEHOLDER,
+        borderWidth: 1,
+        borderRadius: 20,
+        borderBottomEndRadius: 0,
+        backgroundColor: colors.LIGHT
+    },
     container: {
         padding: 16,
+        padding: 16,
     },
+    funcBlock: {
+        maxHeight: 60,
+        minHeight: 50,
     funcBlock: {
         maxHeight: 60,
         minHeight: 50,
@@ -181,8 +224,24 @@ const styles = StyleSheet.create({
     },
     paramText : {
         fontSize: 18
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+    },
+    funcText: {
+        paddingLeft: 10,
+        fontSize: 18,
+    },
+    paramText : {
+        fontSize: 18
     },
     input: {
+        borderWidth: 0.5,
+        borderColor: '#f0f0f0',
+        borderRadius: 8,
+        paddingLeft: 15,
+        paddingVertical: 5,
+        fontSize: 15,
+        backgroundColor: colors.SEARCH,
         borderWidth: 0.5,
         borderColor: '#f0f0f0',
         borderRadius: 8,
