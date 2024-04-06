@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react'
 import LottieView from 'lottie-react-native';
 import colors from '../misc/colors';
 
-export default function LoadingModal({type, visible}) {
+export default function LoadingModal({type, visible, theme}) {
     
   return (
     <Modal visible={visible} animationType='fade' transparent>
-        <View style={[StyleSheet.absoluteFill, styles.background]}/>
+        <View style={[StyleSheet.absoluteFill, {backgroundColor: (theme ==='light') ? colors.LIGHT : colors.DARK, opacity: 0.7}]}/>
         <View style={styles.container}>
-            {(type === "OCR") ? <LottieView source={require("../../assets/animations/OCR.json")} autoPlay loop resizeMode='contain' style={[styles.Lottie, {height: 150, width: 150}]}/>
+            {(type === "OCR") ? <LottieView source={require("../../assets/animations/OCR.json")} autoPlay speed={1.4} loop resizeMode='contain' style={[styles.Lottie, {height: 150, width: 150}]}/>
             : <LottieView source={require("../../assets/animations/LoadingCyrcle.json")} autoPlay loop resizeMode='contain' style={styles.Lottie}/>}
         </View>
     </Modal>
@@ -17,10 +17,6 @@ export default function LoadingModal({type, visible}) {
 }
 
 const styles = StyleSheet.create({
-    background: {
-        backgroundColor: colors.DARK,
-        opacity: 0.3,
-    },
     container: {
         flex: 1,
         alignItems: 'center',

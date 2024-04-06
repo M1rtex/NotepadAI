@@ -3,12 +3,15 @@ import React, { useEffect, useState } from 'react'
 import colors from '../misc/colors'
 import IconView from './Icon'
 import AIScreen from '../screens/AIScreen'
+import {setBackgroundColorAsync} from 'expo-navigation-bar';
 
-export default function AIChooseModal({visible, onClose, onSubmit, noteDesc, setLoading, setLoadingType}) {
+
+export default function AIChooseModal({visible, onClose, onSubmit, noteDesc, setLoading, setLoadingType, theme, backgroundColor}) {
     
     const [AIModalvisible, setAIModalvisible] = useState(false);
     const [SySPrompt, setSysPrompt] = useState(``);
-
+    const borderColor = (theme === 'light') ? colors.GRAY: colors.DARK;
+    (theme === 'light') ? setBackgroundColorAsync(colors.LIGHT) : setBackgroundColorAsync(colors.PRIMARY_DARK);
 
     const handleOnPress = (SysPrompt) => {
         setSysPrompt(SysPrompt);
@@ -29,36 +32,36 @@ export default function AIChooseModal({visible, onClose, onSubmit, noteDesc, set
             <TouchableWithoutFeedback onPress={onClose}>
                 <View style={styles.header}/>
             </TouchableWithoutFeedback>
-            <View style={styles.modal}>
+            <View style={[styles.modal, {backgroundColor: backgroundColor, borderColor: borderColor}]}>
                 <View style={styles.container}>
                     <TouchableOpacity onPress={() => {handleOnPress("Summarise")}}>
                         <View style={styles.funcBlock}>
-                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
-                            <Text style={styles.funcText}>Суммировать текст</Text>
+                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6' theme={theme} />
+                            <Text style={[styles.funcText, {color: (theme == 'light') ? colors.TEXT : colors.TEXT_DARK}]}>Суммировать текст</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => {handleOnPress("Normalize")}}>
                         <View style={styles.funcBlock}>
-                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
-                            <Text style={styles.funcText}>Нормализировать текст</Text>
+                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6' theme={theme} />
+                            <Text style={[styles.funcText, {color: (theme == 'light') ? colors.TEXT : colors.TEXT_DARK}]}>Нормализировать текст</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => {handleOnPress("Translate")}}>
                         <View style={styles.funcBlock}>
-                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
-                            <Text style={styles.funcText}>Перевод текста</Text>
+                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6' theme={theme} />
+                            <Text style={[styles.funcText, {color: (theme == 'light') ? colors.TEXT : colors.TEXT_DARK}]}>Перевод текста</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => {handleOnPress("Refactor")}}>
                         <View style={styles.funcBlock}>
-                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
-                            <Text style={styles.funcText}>Рефакторинг теста</Text>
+                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6' theme={theme} />
+                            <Text style={[styles.funcText, {color: (theme == 'light') ? colors.TEXT : colors.TEXT_DARK}]}>Рефакторинг теста</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => {handleOnPress("Generate")}}>
                         <View style={styles.funcBlock}>
-                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6'/>
-                            <Text style={styles.funcText}>Генерация текста</Text>
+                            <IconView IconName='wand-magic-sparkles' size={27} type='FontAwesome6' theme={theme} />
+                            <Text style={[styles.funcText, {color: (theme == 'light') ? colors.TEXT : colors.TEXT_DARK}]}>Генерация текста</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -76,11 +79,10 @@ const styles = StyleSheet.create({
     },
     modal: {
         paddingTop: 1,
-        borderColor: colors.PLACEHOLDER,
         borderWidth: 1,
+        borderColor: colors.GRAY,
         borderRadius: 20,
         borderBottomEndRadius: 0,
-        backgroundColor: colors.LIGHT
     },
     container: {
         padding: 16,

@@ -9,11 +9,12 @@ const formatNum = (num) => {
   return num
 }
 
-export default function Note({item, onPress}) {
+export default function Note({item, onPress, theme}) {
     const {title, desc, time, color} = item
     const [bgColor, setBgColor] = useState('')
     const [timeColor, setTimeColor] = useState('')
     const [timeTextColor, setTimeTextColor] = useState(colors.TEXT)
+    const [textColor, setTextColor] = useState(colors.TEXT)
 
     const formatTime = time => {
       const date = new Date(time);
@@ -26,38 +27,76 @@ export default function Note({item, onPress}) {
 
   useEffect(() => {
     if (color === 'white') {
-      setBgColor(colors.LIGHT);
-      setTimeColor(colors.LIGHT_TIME);
-      setTimeTextColor(colors.TEXT);
+      if (theme === 'light') {
+        setTextColor(colors.TEXT);
+        setBgColor(colors.LIGHT);
+        setTimeColor(colors.LIGHT_TIME);
+        setTimeTextColor(colors.TEXT);
+      } else if (theme === 'dark') {
+        setBgColor(colors.BLACK_CARD);
+        setTimeColor(colors.SECONDARY_DARK);
+        setTimeTextColor(colors.TEXT_DARK);
+        setTextColor(colors.TEXT_DARK)
+      }
     }
     if (color === 'red') {
-      setBgColor(colors.RED_CARD);
-      setTimeColor(colors.RED_TIME);
-      setTimeTextColor(colors.LIGHT);
+      if (theme === 'light') {
+        setTextColor(colors.TEXT);
+        setBgColor(colors.RED_CARD);
+        setTimeColor(colors.RED_TIME);
+        setTimeTextColor(colors.LIGHT);
+      } else if (theme === 'dark') {
+        setBgColor(colors.RED_CARD_DARK);
+        setTimeColor(colors.RED_TIME_DARK);
+        setTimeTextColor(colors.LIGHT);
+        setTextColor(colors.TEXT_DARK)
+      }
     }
     if (color === 'purple') {
-      setBgColor(colors.PURPLE_CARD);
-      setTimeColor(colors.PURPLE_TIME);
-      setTimeTextColor(colors.LIGHT);
+      if (theme === 'light') {
+        setTextColor(colors.TEXT);
+        setBgColor(colors.PURPLE_CARD);
+        setTimeColor(colors.PURPLE_TIME);
+        setTimeTextColor(colors.LIGHT);
+      } else if (theme === 'dark') {
+        setBgColor(colors.PURPLE_CARD_DARK);
+        setTimeColor(colors.PURPLE_TIME_DARK);
+        setTimeTextColor(colors.LIGHT);
+        setTextColor(colors.TEXT_DARK);
+      }
     }
     if (color === 'green') {
-      setBgColor(colors.GREEN_CARD);
-      setTimeColor(colors.GREEN_TIME);
-      setTimeTextColor(colors.LIGHT);
+      if (theme === 'light') {
+        setTextColor(colors.TEXT);
+        setBgColor(colors.GREEN_CARD);
+        setTimeColor(colors.GREEN_TIME);
+        setTimeTextColor(colors.LIGHT);
+      } else if (theme === 'dark') {
+        setBgColor(colors.GREEN_CARD_DARK);
+        setTimeColor(colors.GREEN_TIME_DARK);
+        setTimeTextColor(colors.GRAY_TIME);
+        setTextColor(colors.PRIMARY_DARK)
+      }
     }
     if (color === 'yellow') {
-      setBgColor(colors.YELLOW_CARD);
-      setTimeColor(colors.YELLOW_TIME);
-      setTimeTextColor(colors.TEXT);
+      if (theme === 'light') {
+        setBgColor(colors.YELLOW_CARD);
+        setTimeColor(colors.YELLOW_TIME);
+        setTimeTextColor(colors.TEXT);
+      } else if (theme === 'dark') {
+        setBgColor(colors.YELLOW_CARD_DARK);
+        setTimeColor(colors.YELLOW_TIME_DARK);
+        setTimeTextColor(colors.GRAY_TIME);
+      }
     }
-  }, [color])
+  }, [color, theme])
 
 
   return (
     <TouchableOpacity onPress={onPress} style={[styles.container, {backgroundColor: bgColor}]} >
       <View style={styles.text_zone}>
-        <Text numberOfLines={2} style={styles.title}>{title}</Text>
-        <Text numberOfLines={5} style={styles.desc}>{desc}</Text>
+        <Text numberOfLines={2} style={[styles.title, {color: textColor}]}>{title}</Text>
+        <Text numberOfLines={5} style={[styles.desc, {color: textColor}]}>{desc}</Text>
       </View>
       <View style={[styles.time_zone, {backgroundColor: timeColor}]}>
         <Text style={[styles.time, {color: timeTextColor}]}>{formatTime(time)}</Text>
@@ -70,7 +109,6 @@ const width = (Dimensions.get('window').width - 40) / 2
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: colors.LIGHT,
         width: width - 10,
         height: 150,
         border: 2,
@@ -80,11 +118,9 @@ const styles = StyleSheet.create({
     },
     title: {
         fontWeight: 'bold',
-        color: colors.TEXT,
         fontSize: 20
     },
     desc: {
-      color: colors.TEXT,
       fontSize: 12,
     },
     time_zone: {
@@ -92,6 +128,7 @@ const styles = StyleSheet.create({
       borderBottomEndRadius: 10,
       borderBottomStartRadius: 10,
       padding: 4,
+      paddingHorizontal: 10
     },
     time: {
       fontSize: 10,

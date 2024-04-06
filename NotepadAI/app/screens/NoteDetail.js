@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useHeaderHeight } from '@react-navigation/elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import colors from '../misc/colors';
-import { useNotes } from '../context/NoteContext';
+import { useNotes, useTheme } from '../context/NoteContext';
 import IconView from '../components/Icon'
 import BackButton from '../components/BackButton'
 
@@ -18,6 +18,7 @@ const formatNum = (num) => {
 export default function NoteDetail(props) {
     const [note, setNote] = useState(props.route.params.note);
     const {setNotes, findNotes} = useNotes()
+    const {theme, setTheme, textColor, backgroundColor} = useTheme();
 
     const headerHeight = useHeaderHeight()
 
@@ -101,16 +102,16 @@ export default function NoteDetail(props) {
 
     return (
         <>
-        <ScrollView style={{backgroundColor: colors.LIGHT}} contentContainerStyle={[styles.container, {marginTop: headerHeight}]}>
-            <View style={[styles.statusBtns, {paddingBottom: 21, paddingTop: 16}]}>
+        <ScrollView style={{backgroundColor: backgroundColor}} contentContainerStyle={[styles.container, {marginTop: headerHeight, backgroundColor: backgroundColor}]}>
+            <View style={[styles.statusBtns, {paddingBottom: 15, marginBottom:10, paddingTop: 16, borderBottomColor: (theme === 'light') ? colors.STROKE: colors.SECONDARY_DARK, borderBottomWidth: 1}]}>
                 <BackButton onPress={() => {navigation.goBack()}}/>
             </View>
-            <Text style={[styles.title, styles.text]}>{note.title}</Text>
-            <Text style={[styles.desc, styles.text]}>{note.desc}</Text>
+            <Text style={[styles.title, {color: textColor}]}>{note.title}</Text>
+            <Text style={[styles.desc, {color: textColor}]}>{note.desc}</Text>
         </ScrollView>
-        <View style={styles.task_bar}>
+        <View style={[styles.task_bar, {backgroundColor: backgroundColor}]}>
             <View style={styles.time_block}>
-            <Text style={styles.time}>{(note) ? formatTime(note.time) : 'Новая заметка'}</Text>
+                <Text style={[styles.time, {color: textColor}]}>{(note) ? formatTime(note.time) : 'Новая заметка'}</Text>
             </View>
             <View style={styles.btns_block}>
                 <View style={[styles.btn_squere]}>
@@ -128,10 +129,6 @@ export default function NoteDetail(props) {
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 15,
-        backgroundColor: colors.LIGHT
-    },
-    text: {
-        color: colors.DARK
     },
     title: {
         fontSize: 30,
@@ -156,7 +153,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: colors.LIGHT,
     },
     time_block: {
         justifyContent: "center",

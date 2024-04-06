@@ -1,13 +1,14 @@
-import { StyleSheet, Text, View, StatusBar, TouchableWithoutFeedback, Keyboard, FlatList } from 'react-native'
+import { StyleSheet, Text, View, StatusBar, TouchableWithoutFeedback, Keyboard, FlatList, useColorScheme } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import colors from '../misc/colors'
 import SearchBar from '../components/SearchBar'
 import RoundIconBtn from '../components/RoundIconBtn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Note from '../components/note'
-import { useNotes } from '../context/NoteContext'
+import { useNotes, useTheme } from '../context/NoteContext'
 import NotFound from '../components/NotFound'
 import IconView from '../components/Icon'
+import SplashScreen from '../components/SplashScreen'
 
 const reverseData = data => {
     return data.sort((a, b) => {
@@ -20,10 +21,12 @@ const reverseData = data => {
   };
 
 export default function NotesScreen({user, navigation, route}) {
-    const [greet, setGreet] = useState("")
-    const {notes, setNotes, findNotes} = useNotes()
+    const [greet, setGreet] = useState("");
+    const {notes, setNotes, findNotes} = useNotes();
+    const {theme, setTheme} = useTheme();
     const [searchQuery, setSearchQuery] = useState('');
-    const [resultNotFound, setResultNotFound] = useState(false)
+    const [resultNotFound, setResultNotFound] = useState(false);
+    const [SplashVisible, setSplashVisible] = useState(true);
 
     const findGreet = () => {
         const hrs = new Date().getHours()
@@ -70,6 +73,13 @@ export default function NotesScreen({user, navigation, route}) {
         navigation.navigate('NoteDetail', {note})
     }
 
+    const handleOnSplashEnding = async (nextScreen) => {
+        setSplashVisible(false);
+        if (nextScreen) {
+            navigation.navigate(nextScreen);
+        };
+    }
+
 
     useEffect(() => {
         if (route.params?.post) {
@@ -87,14 +97,14 @@ export default function NotesScreen({user, navigation, route}) {
 
   return (
     <>
-        <StatusBar barStyle='dark-content' backgroundColor={colors.LIGHT} />
+        <StatusBar barStyle={(theme === 'light') ? 'dark-content': 'light-content'} backgroundColor={(theme === 'light') ? colors.LIGHT: colors.PRIMARY_DARK} />
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
+        <View style={[styles.container, {backgroundColor: (theme === 'light') ? colors.LIGHT : colors.PRIMARY_DARK}]}>
             <View style={styles.userBar}>
-                <Text style={[styles.header, styles.text]}>{`Добр${greet}, ${user.name}!`}</Text>
+                <Text style={[styles.header, {color: (theme === 'light') ? colors.TEXT : colors.TEXT_DARK}]}>{`Добр${greet}, ${user.name}!`}</Text>
                 {/* <RoundIconBtn IconName="user-minus" size={12} style={styles.deleteBtn} onPress={async () => {await AsyncStorage.clear(); console.log("Storage cleared")}} /> */}
                 <View style={styles.settingBtn}>
-                    <IconView IconName='setting' type='AntDesign' size={28} onPress={() => {navigation.navigate('Settings')}}/>
+                    <IconView IconName='setting' type='AntDesign' size={28} onPress={() => {navigation.navigate('Settings')}} theme={theme}/>
                 </View>
             </View>
             {(notes.length) ? 
@@ -102,6 +112,7 @@ export default function NotesScreen({user, navigation, route}) {
                     onChangeText={handleOnSearchInput}
                     onClear={handleOnClear}
                     containerStyle={styles.search}
+                    theme={theme}
                 />
             : null}
 
@@ -111,17 +122,18 @@ export default function NotesScreen({user, navigation, route}) {
                 data={reverseData(notes)}
                 columnWrapperStyle={{justifyContent: 'space-between', marginBottom: 15, padding: 2}}
                 keyExtractor={item => item.id.toString()} 
-                renderItem={({item}) => <Note onPress={() => {openNote(item)}} item={item}/>}
+                renderItem={({item}) => <Note onPress={() => {openNote(item)}} item={item} theme={theme}/>}
             />}
             
             {(!notes.length) ? 
             <View style={[StyleSheet.absoluteFillObject, styles.emptyHeaderContainer]}>
-                <Text style={styles.emptyHeader}>Добавьте записи</Text>
+                <Text style={[styles.emptyHeader, {color: (theme === 'light') ? colors.TEXT : colors.TEXT_DARK}]}>Добавьте записи</Text>
             </View>
             : null}
         </View>
         </TouchableWithoutFeedback>
         <RoundIconBtn IconName="plus" style={styles.addBtn} onPress={() => {navigation.navigate("NoteInputScreen", {})}}/>
+        <SplashScreen visible={SplashVisible} onAnimationFinish={handleOnSplashEnding} />
     </>
   )
 }
@@ -133,7 +145,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         flex: 1,
         zIndex: 1,
-        backgroundColor: colors.LIGHT
     },
     header: {
         fontSize: 24,

@@ -1,5 +1,5 @@
 const url = 'https://api.together.xyz/v1/chat/completions';
-const apiKey = '{API_KEY}';
+const apiKey = 'ced5adc36ab877527b6e709897c3e0dcc4727167979388071f4d3b5578760947';
 const headers = new Headers({
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${apiKey}`

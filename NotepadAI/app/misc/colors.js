@@ -3,6 +3,7 @@ export default {
     TEXT: '#5e5e5e',
     LIGHT: '#FFFFFF',
     PRIMARY: '#f74f4f',
+    STROKE: '#EFEEF0',
     PEACH: '#f4b158',
     PINK: '#f4768e',
     BLUE: '#0184de',
@@ -42,4 +43,5 @@ export default {
     SEARCH_BG_DARK: '#1f1f1f',
     SEARCH_TEXT_DARK: '#818181',
     BLACK_CARD: '#1A1A1A',
+    GRAY_TIME: '#827D89'
 }

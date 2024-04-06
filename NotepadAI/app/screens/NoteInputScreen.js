@@ -1,14 +1,13 @@
 import { Alert, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useNotes } from '../context/NoteContext'
+import { useNotes, useTheme } from '../context/NoteContext'
 import colors from '../misc/colors'
 import OCR from '../components/OCR'
 import IconView from '../components/Icon'
 import BackButton from '../components/BackButton'
 import AIChooseModal from '../components/AIChooseModal'
 import ExtraMenuModal from '../components/ExtraMenuModal'
-import TranslateSelectorModal from '../components/TranslateSelectorModal'
 import LoadingModal from '../components/LoadingModal'
 
 const formatNum = (num) => {
@@ -25,10 +24,14 @@ export default function NoteInputScreen(props) {
     const [note, setNote] = useState(props.route.params.note);
     const [color, setColor] = useState((isEdit) ? note.color : 'white');
     const {notes, setNotes, findNotes} = useNotes();
+    const {theme, setTheme} = useTheme();
     const [AIModal, setAIModal] = useState(false);
     const [extraModal, setExtraModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [loadingType, setLoadingType] = useState('AI');
+
+    const [backgroundColor, setBackgroundColor] = useState((theme === 'light') ? colors.LIGHT: colors.PRIMARY_DARK);
+    const [textColor, setTextColor] = useState((theme === 'light') ? colors.TEXT: colors.TEXT_DARK);
 
     const navigation = props.navigation;
 
@@ -106,7 +109,6 @@ export default function NoteInputScreen(props) {
     }
 
     const toggleAIModal = () => {
-    const toggleAIModal = () => {
         setAIModal(!AIModal)
     }
 
@@ -129,40 +131,39 @@ export default function NoteInputScreen(props) {
 
   return (
   <>
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView style={[styles.container, {backgroundColor: backgroundColor}]}>
         <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
             <View>
-                <View style={[styles.statusBtns, {paddingBottom: 21, paddingTop: 16}]}>
+                <View style={[styles.statusBtns, {paddingBottom: 10, marginBottom: 13, paddingTop: 16, borderBottomColor: (theme === 'light') ? colors.STROKE: colors.SECONDARY_DARK, borderBottomWidth: 1}]}>
                     <BackButton onPress={onClose}/>
                     <View style={styles.statusBtns} >
-                        <OCR onResult={onOCR} setLoading={setIsLoading} setLoadingType={setLoadingType}/>
-                        <IconView IconName='check' type='FontAwesome6' size={27} onPress={onConfirm} style={{paddingLeft: 15}} />
+                        <OCR onResult={onOCR} setLoading={setIsLoading} setLoadingType={setLoadingType} theme={theme}/>
+                        <IconView IconName='check' type='FontAwesome6' size={27} onPress={onConfirm} style={{paddingLeft: 15}} theme={theme} />
                     </View>
                 </View>
                 <View style={styles.input_block}>
-                    <TextInput value={title} placeholder='Заголовок' placeholderTextColor={colors.PLACEHOLDER} style={[styles.input, styles.title]} onChangeText={(text) => {setTitle(text)}} />
-                    <TextInput value={desc} multiline placeholder='Описание заметки' placeholderTextColor={colors.PLACEHOLDER} style={[styles.input, styles.desc]} onChangeText={(text) => {setDesc(text)}} />
+                    <TextInput value={title} placeholder='Заголовок' placeholderTextColor={textColor} style={[styles.input, {color: textColor}, styles.title]} onChangeText={(text) => {setTitle(text)}} />
+                    <TextInput value={desc} multiline placeholder='Описание заметки' placeholderTextColor={textColor} style={[styles.input, {color: textColor}, styles.desc]} onChangeText={(text) => {setDesc(text)}} />
                 </View>
             </View>
         </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
-    <KeyboardAvoidingView style={styles.task_bar}>
+    <KeyboardAvoidingView style={[styles.task_bar, {backgroundColor: backgroundColor}]}>
         <View style={styles.time_block}>
-        <Text style={styles.time}>{(note) ? formatTime(note.time) : 'Новая заметка'}</Text>
+        <Text style={[styles.time, {color: textColor}]}>{(note) ? formatTime(note.time) : 'Новая заметка'}</Text>
         </View>
         <View style={styles.btns_block}>
             <View style={styles.btn_squere}>
-                <IconView IconName="wand-magic-sparkles" type="FontAwesome6" onPress={toggleAIModal} />
-                <IconView IconName="wand-magic-sparkles" type="FontAwesome6" onPress={toggleAIModal} />
+                <IconView IconName="wand-magic-sparkles" type="FontAwesome6" onPress={toggleAIModal} theme={theme} />
             </View>
             <View style={[styles.btn_squere, {backgroundColor: colors.PURPLE}]}>
-                <IconView IconName="ellipsis-h" type="FontAwesome5" style={{color: colors.WHITE_LIGHT}} onPress={toggleExtraModal}/>
+                <IconView IconName="ellipsis-h" type="FontAwesome5" style={{color: colors.WHITE_LIGHT}} onPress={toggleExtraModal} theme={theme} />
             </View>
         </View>
     </KeyboardAvoidingView>
-    <AIChooseModal visible={AIModal} onClose={toggleAIModal} noteDesc={desc} onSubmit={handleOnAIans} setLoading={setIsLoading} setLoadingType={setLoadingType} />
+    <AIChooseModal visible={AIModal} onClose={toggleAIModal} noteDesc={desc} onSubmit={handleOnAIans} setLoading={setIsLoading} setLoadingType={setLoadingType} theme={theme} backgroundColor={backgroundColor}/>
     <ExtraMenuModal visible={extraModal} color={color} onDelete={(isEdit) ?  displayDeleteAlert : () => {}} onChangeColor={handleColorChange} onClose={toggleExtraModal}/>
-    <LoadingModal visible={isLoading} type={loadingType}/>
+    <LoadingModal visible={isLoading} type={loadingType} theme={theme} />
   </>
   )
 }
@@ -177,11 +178,9 @@ const styles = StyleSheet.create({
     },
     input: {
         fontSize: 20,
-        color: colors.TEXT,
     },
     container: {
         flex: 1,
-        backgroundColor: colors.LIGHT,
         paddingHorizontal: 20,
     },
     title: {
@@ -207,7 +206,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: colors.LIGHT,
     },
     btns_block: {
         width: 96,
