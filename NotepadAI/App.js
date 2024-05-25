@@ -1,14 +1,11 @@
 import 'react-native-gesture-handler';
-import { StyleSheet, useColorScheme, Easing, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Intro from './app/screens/Intro';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NotesScreen from './app/screens/NotesScreen';
-import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import { TransitionSpecs, CardStyleInterpolators } from "@react-navigation/stack";
-import { TransitionPresets } from '@react-navigation/stack';
 
 import NoteDetail from './app/screens/NoteDetail';
 import colors from './app/misc/colors';
