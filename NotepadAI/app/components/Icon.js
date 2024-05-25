@@ -3,13 +3,15 @@ import React from 'react'
 import { FontAwesome6, AntDesign, FontAwesome5 } from '@expo/vector-icons'
 import colors from '../misc/colors'
 
-export default function IconView({type, IconName, size, style, onPress}) {
+export default function IconView({type, IconName, size, style, onPress, theme}) {
+
+
     if (type === "FontAwesome6") {
         return (
             <FontAwesome6 
             name={IconName} 
             size={size || 21} 
-            color={colors.DARK} 
+            color={(theme === 'light') ? colors.DARK: colors.TEXT_DARK} 
             style={[styles.icon, {...style}]}
             onPress={onPress}/>
           )
@@ -19,7 +21,7 @@ export default function IconView({type, IconName, size, style, onPress}) {
             <FontAwesome5 
             name={IconName} 
             size={size || 21} 
-            color={colors.DARK} 
+            color={(theme === 'light') ? colors.DARK: colors.TEXT_DARK} 
             style={[styles.icon, {...style}]}
             onPress={onPress}/>
           )
@@ -29,7 +31,7 @@ export default function IconView({type, IconName, size, style, onPress}) {
             <AntDesign 
             name={IconName} 
             size={size || 21} 
-            color={colors.DARK} 
+            color={(theme === 'light') ? colors.DARK: colors.TEXT_DARK} 
             style={[styles.icon, {...style}]}
             onPress={onPress}/>
           )

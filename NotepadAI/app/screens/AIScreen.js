@@ -4,14 +4,17 @@ import colors from '../misc/colors'
 import { SelectList } from 'react-native-dropdown-select-list'
 import askAI, {NormalizeTextPrompt, TranslateTextPrompt, RefactorTextPrompt, GenerateTextPrompt, SummariseTextPrompt} from '../components/AI'
 import IconView from '../components/Icon'
+import { useTheme } from '../context/NoteContext'
 
-export default function AIScreen({visible, onClose, Prompt, desc, onSubmit}) {
+export default function AIScreen({visible, onClose, Prompt, desc, onSubmit, setLoading}) {
+
+    const {theme, backgroundColor, textColor} = useTheme();
 
     const [lang, setLang] = useState("");
     const [headerHeight, setHeaderHeight] = useState(351);
     const [hintEnable, setHintEnable] = useState(true);
     const [accept, setAccept] = useState(false);
-    const [theme, setTheme] = useState("");
+    const [ask_theme, setAskTheme] = useState("");
     const [tone, setTone] = useState("");
     const [Tstyle, setTStyle] = useState("");
 
@@ -19,7 +22,7 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit}) {
     const translateChoses = [
         {key:'en', value:'Английский'},
         {key:'ru', value:'Русский'},
-        {key:'fr', value:'Французский'},
+        {key:'de', value:'Немецкий'},
         {key:'it', value:'Итальянский'},
         {key:'es', value:'Испанский'},
     ]
@@ -39,23 +42,19 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit}) {
         {key:'4', value:'Дипломатичный'},
     ]
 
-    const onConfirm = (ans) => {
-        onSubmit(ans);
-        onExit();
-    }
-
     const onExit = () => {
         setHeaderHeight(351);
         setHintEnable(true);
         setLang("");
         setTStyle("");
-        setTheme("");
+        setAskTheme("");
         setTone("");
         setAccept(false);
         onClose();
     }
     
     const onRequest = async () => {
+        setLoading(true);
         if (accept) {
             let SysPrompt = ``
             let request = `${desc}`
@@ -71,8 +70,7 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit}) {
             }
             if (Prompt == "Generate") {
                 SysPrompt = GenerateTextPrompt
-                request = theme
-                console.log("[THEME] " + theme)
+                request = ask_theme
             }
             if (Prompt == "Refactor") {
                 SysPrompt = RefactorTextPrompt
@@ -92,19 +90,23 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit}) {
                     content: request
                 }
             ]
+            onExit();
             await askAI(messages=messages).then((response) => {
                 let ans = response.Result.choices[0].message.content
                 if (ans) {
-                    console.log(typeof ans)
                     console.log(ans)
-                    onConfirm(ans)
+                    if (Prompt == "Generate") {
+                        onSubmit(ans, request)
+                    }
+                    onSubmit(ans, null)
+                    setLoading(false);
                 }
             })
         }
     }
 
     const onThemeFieldChange = text => {
-        setTheme(text);
+        setAskTheme(text);
     }
 
     useEffect(() => {
@@ -116,12 +118,12 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit}) {
     }, [Prompt])
 
     useEffect(() => {
-        if (lang || theme || (tone && Tstyle)) {
+        if (lang || ask_theme || (tone && Tstyle)) {
             setAccept(true)
         } else {
             setAccept(false)
         }
-    }, [lang, theme, tone, Tstyle])
+    }, [lang, ask_theme, tone, Tstyle])
 
 
   return (
@@ -132,21 +134,22 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit}) {
             <TouchableWithoutFeedback onPress={onExit}>
                 <View style={{minHeight: headerHeight}}/>
             </TouchableWithoutFeedback>
-            <View style={styles.modal}>
+            <View style={[styles.modal, {backgroundColor: backgroundColor}]}>
                 <View style={styles.container}>
-                    <Text>{(hintEnable)? "Параметры:" : null}</Text>
-                    {(Prompt == "Normalize" | Prompt == "Summarise") ? <Text style={styles.paramText}>Данные готовы к отправке!</Text>: null}
-                    {(Prompt == "Translate") ? <SelectList search={false} placeholder='Выберите язык' setSelected={(k) => setLang(k)} data={translateChoses} save="key"/>: null}
-                    {(Prompt == "Generate") ? <TextInput placeholder={"Введите тему"} onChangeText={onThemeFieldChange} style={styles.input}/>: null}
+                    <Text style={{color: textColor, paddingBottom: 10}}>{(hintEnable)? "Параметры:" : null}</Text>
+                    {(Prompt == "Normalize" | Prompt == "Summarise") ? <Text style={[styles.paramText, {color: textColor}]}>Данные готовы к отправке!</Text>: null}
+                    {(Prompt == "Translate") ? <SelectList search={false} dropdownTextStyles={{color: textColor}} inputStyles={{color: textColor}} placeholder='Выберите язык' setSelected={(k) => setLang(k)} data={translateChoses} save="key"/>: null}
+                    {(Prompt == "Generate") ? <TextInput placeholder={"Введите тему"} onChangeText={onThemeFieldChange} style={[styles.input, {backgroundColor: (theme == "light") ? colors.SEARCH : colors.SEARCH_BG_DARK, color: textColor}]} placeholderTextColor={textColor}/>: null}
                     {(Prompt == "Refactor") ? <>
-                    <SelectList search={false} placeholder='Выберите тон' setSelected={(v) => setTone(v)} data={tonsChoses} save="value"/>
-                    <SelectList search={false} placeholder='Выберите стиль' setSelected={(v) => setTStyle(v)} data={TstyleChoses} save="value"/>
+                    <SelectList search={false} dropdownTextStyles={{color: textColor}} inputStyles={{color: textColor}} placeholder='Выберите тон' setSelected={(v) => setTone(v)} data={tonsChoses} save="value"/>
+                    <View style={{height: 5}}/>
+                    <SelectList search={false} dropdownTextStyles={{color: textColor}} inputStyles={{color: textColor}} placeholder='Выберите стиль' setSelected={(v) => setTStyle(v)} data={TstyleChoses} save="value"/>
                     </>
                     : null}
-                    <TouchableOpacity onPress={() => {onRequest()}}>
+                    <TouchableOpacity onPress={onRequest}>
                         <View style={styles.funcBlock}>
-                            <IconView IconName='paper-plane' size={25} type='FontAwesome5'/>
-                            <Text style={styles.funcText}>Запрос</Text>
+                            <IconView IconName='paper-plane' size={25} type='FontAwesome5' theme={theme}/>
+                            <Text style={[styles.funcText, {color: textColor}]}>Запрос</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -160,13 +163,13 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit}) {
 const styles = StyleSheet.create({
     modal: {
         minHeight: 400,
-        borderColor: colors.PLACEHOLDER,
-        borderWidth: 1,
+        borderColor: colors.GRAY,
+        borderWidth: 0.3,
         borderRadius: 20,
         borderBottomEndRadius: 0,
-        backgroundColor: colors.LIGHT
     },
     container: {
+        padding: 16,
         padding: 16,
     },
     funcBlock: {
@@ -181,15 +184,15 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     paramText : {
-        fontSize: 18
+        fontSize: 18,
+        alignItems: 'center',
+        justifyContent: 'flex-start',
     },
     input: {
-        borderWidth: 0.5,
         borderColor: '#f0f0f0',
         borderRadius: 8,
         paddingLeft: 15,
         paddingVertical: 5,
         fontSize: 15,
-        backgroundColor: colors.SEARCH,
     },
 })

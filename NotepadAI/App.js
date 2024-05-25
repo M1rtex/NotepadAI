@@ -1,17 +1,21 @@
-import { StyleSheet, LogBox } from 'react-native';
+import 'react-native-gesture-handler';
+import { StyleSheet, useColorScheme, Easing, View } from 'react-native';
 import Intro from './app/screens/Intro';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NotesScreen from './app/screens/NotesScreen';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import NoteDetail from './app/components/NoteDetail';
+
+import { TransitionSpecs, CardStyleInterpolators } from "@react-navigation/stack";
+import { TransitionPresets } from '@react-navigation/stack';
+
+import NoteDetail from './app/screens/NoteDetail';
 import colors from './app/misc/colors';
-import { NoteContext } from './app/context/NoteContext';
-import OCR from './app/components/OCR';
-import AIScreen from './app/screens/AIScreen';
+import { NoteContext, ThemeContext } from './app/context/NoteContext';
 import NoteInputScreen from './app/screens/NoteInputScreen';
 import SettingsScreen from './app/screens/SettingsScreen';
+import {setBackgroundColorAsync} from 'expo-navigation-bar';
 
 
 const Stack = createNativeStackNavigator();
@@ -19,9 +23,12 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
       const [user, setUser] = useState({});
-      const [isAppFirstTimeOpen, setIsAppFirstTimeOpen] = useState(false);
-      const [headerShown, SetHeaderShown] = useState(true);
       const [notes, setNotes] = useState([]);
+      const [isFirstTime, setIsFirstTime] = useState(true);
+      const [theme, setTheme] = useState('light');
+      (theme == "light") ? setBackgroundColorAsync(colors.LIGHT) : setBackgroundColorAsync(colors.PRIMARY_DARK);
+      const [backgroundColor, setBackgroundColor] = useState((theme === 'light') ? colors.LIGHT: colors.PRIMARY_DARK);
+      const [textColor, setTextColor] = useState((theme === 'light') ? colors.TEXT: colors.TEXT_DARK);
 
       const findNotes = async () => {
         const result = await AsyncStorage.getItem('notes');
@@ -30,27 +37,72 @@ export default function App() {
 
       const findUser = async () => {
         const result = await AsyncStorage.getItem('user');
-        if (result === null) {
-          return setIsAppFirstTimeOpen(true)
+        if (result) {
+          setUser(JSON.parse(result));
         };
-        setUser(JSON.parse(result));
-        setIsAppFirstTimeOpen(false);
       };
 
+      const setCurrentColorNavBar = (theme) => {
+        if (theme == "light") {
+          setBackgroundColorAsync(colors.LIGHT);
+        } if (theme == 'dark') {
+          setBackgroundColorAsync(colors.PRIMARY_DARK);
+        }
+      }
+
+      const getThemeDB = async () => {
+        const themeDB = await AsyncStorage.getItem('theme');
+        return themeDB
+      }
+
+      const getallkeysDB = async () => {
+        const us = await AsyncStorage.getAllKeys();
+        console.log(us);
+      }
+
+      const setThemeDB = async (gonaBe) => {
+        await AsyncStorage.setItem('theme', gonaBe)
+      }
+
       useEffect(() => {
+        if (theme == "light") {
+          setBackgroundColor(colors.LIGHT);
+          setTextColor(colors.TEXT);
+        } if (theme == 'dark') {
+          setBackgroundColor(colors.PRIMARY_DARK);
+          setTextColor(colors.TEXT_DARK);
+        }
+        setCurrentColorNavBar(theme);
+      }, [theme])
+
+
+      useEffect(() => {
+        if (isFirstTime) {
+          setIsFirstTime(false);
+          getThemeDB().then((themeDB) => {
+            const db_theme = themeDB
+            if (db_theme == undefined) {
+              setThemeDB(JSON.stringify({type: "light"}));
+            } else {
+              setTheme(JSON.parse(db_theme).type);
+            }
+          })
+        }
         findUser();
         findNotes();
-        SetHeaderShown(false);
       }, []);
 
-      if (isAppFirstTimeOpen) return <Intro onComplete={findUser} />;
-
     return (
-        <NavigationContainer>
+        <NavigationContainer theme={DarkTheme}>
+          <ThemeContext.Provider value={{theme, setTheme, backgroundColor, textColor, setCurrentColorNavBar}}>
           <NoteContext.Provider value={{notes, setNotes, findNotes}}>
-            <Stack.Navigator cardStyle={{backgroundColor: colors.LIGHT}} screenOptions={{headerTitle: '', headerTransparent: true, headerShown: false}}>
+          <View style={[{backgroundColor: backgroundColor}, StyleSheet.absoluteFill]}>
+            <Stack.Navigator screenOptions={{headerTitle: '', headerTransparent: true, headerShown: false}}>
               <Stack.Screen name='NotesScreen'>
                 {(props) => <NotesScreen {...props} user={user} />}
+              </Stack.Screen>
+              <Stack.Screen name='IntroScreen'>
+                {(props) => <Intro {...props} onComplete={findUser} />}
               </Stack.Screen>
               <Stack.Screen name='NoteDetail'>
                 {(props) => <NoteDetail {...props}  />}
@@ -62,7 +114,9 @@ export default function App() {
                 {(props) => <SettingsScreen {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
+          </View>
           </NoteContext.Provider>
+          </ThemeContext.Provider>
         </NavigationContainer>
     );
     }

@@ -4,10 +4,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import colors from '../misc/colors';
 import IconView from '../components/Icon'
 import BackButton from '../components/BackButton'
+import { useTheme } from '../context/NoteContext';
+import ThemeChooseModal from '../components/ThemeChooseModal';
 
 export default function SettingsScreen(props) {
     const navigation = props.navigation;
     const [user, setUser] = useState("");
+    const [themeChooseModalVisible, setThemeChooseModalVisible] = useState(false);
+    const {theme, backgroundColor, textColor} = useTheme();
+    const [avatarColor, setAvatarColor] = useState((theme === 'light') ? colors.LIGHT_TIME : colors.DARK);
 
     const getUser = async () => {
         const result = await AsyncStorage.getItem('user');
@@ -31,50 +36,54 @@ export default function SettingsScreen(props) {
             }
         ], {cancelable: true})
     }
-
+    
+    useEffect(() => {
+        (theme === 'light') ? setAvatarColor(colors.LIGHT_TIME) : setAvatarColor(colors.DARK)
+    }, [theme])
 
     useEffect(() => {
         getUser();
     }, [])
 
   return (
-    <View style={styles.container}>
+    <>
+    <View style={[styles.container, {backgroundColor: backgroundColor}, StyleSheet.absoluteFill]}>
         <View style={[styles.statusBtns, {paddingBottom: 24, paddingTop: 21}]}>
             <BackButton onPress={() => {navigation.goBack()}}/>
             <View style={[styles.header, StyleSheet.absoluteFill]}>
-                <Text style={styles.headerText}>Настройки</Text>
+                <Text style={[styles.headerText, {color: textColor}]}>Настройки</Text>
             </View>
         </View>
         <View style={styles.nameBlock}>
             <View style={styles.avatarBlock}>
-                <View style={styles.avatar}>
-                    <IconView IconName='user-alt' type='FontAwesome5' size={42}/>
+                <View style={[styles.avatar, {backgroundColor: avatarColor}]}>
+                    <IconView IconName='user-alt' type='FontAwesome5' size={42} theme={theme}/>
                 </View>
-                <Text style={styles.name}>{user.name}</Text>
+                <Text style={[styles.name, {color: textColor}]}>{user.name}</Text>
             </View>
-            <TouchableOpacity style={styles.changeNameBtn}>
-                <IconView IconName='pencil-alt' type='FontAwesome5' size={21}/>
-                <Text style={styles.changeNameText}>Изменить имя</Text>
+            <TouchableOpacity style={[styles.changeNameBtn, {borderColor: colors.PURPLE}]}>
+                <IconView IconName='pencil-alt' type='FontAwesome5' size={21} style={{color: colors.PURPLE}}/>
+                <Text style={[styles.changeNameText, {color: colors.PURPLE}]}>Изменить имя</Text>
             </TouchableOpacity>
         </View>
         <View style={styles.settingsBlock}>
-            <Text style={styles.hintText}>НАСТРОЙКИ ПРИЛОЖЕНИЯ</Text>
+            <Text style={[styles.hintText, {color: textColor}]}>НАСТРОЙКИ ПРИЛОЖЕНИЯ</Text>
             <View style={styles.changeAPIBtn}>
                 <TouchableOpacity style={styles.funcBtn} onPress={() => {}}>
                     <View style={styles.funcBlock}>
-                        <IconView IconName='wand-magic' size={27} type='FontAwesome6'/>
-                        <Text style={styles.funcText}>Change API Keys</Text>
+                        <IconView IconName='wand-magic' size={27} type='FontAwesome6' theme={theme}/>
+                        <Text style={[styles.funcText, {color: textColor}]}>Change API Keys</Text>
                     </View>
-                    <IconView IconName='angle-right' size={20} type='FontAwesome6'/>
+                    <IconView IconName='angle-right' size={20} type='FontAwesome6' theme={theme}/>
                 </TouchableOpacity>
             </View>
             <View style={styles.changeThemeBtn}>
-                <TouchableOpacity style={styles.funcBtn} onPress={() => {}}>
+                <TouchableOpacity style={styles.funcBtn} onPress={() => {setThemeChooseModalVisible(true)}}>
                     <View style={styles.funcBlock}>
-                        <IconView IconName='adjust' size={27} type='FontAwesome5'/>
-                        <Text style={styles.funcText}>Тема</Text>
+                        <IconView IconName='adjust' size={27} type='FontAwesome5' theme={theme}/>
+                        <Text style={[styles.funcText, {color: textColor}]}>Тема</Text>
                     </View>
-                    <Text style={styles.currTheme}>Светлая</Text>
+                    <Text style={[styles.currTheme, {color: textColor}]}>{(theme == "light") ? "Светлая" : "Тёмная"}</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -86,17 +95,18 @@ export default function SettingsScreen(props) {
                 </View>
             </TouchableOpacity>
         </View>
-        <View style={[styles.version, StyleSheet.absoluteFillObject]}>
-            <Text style={styles.versionText}>NotepadAI v1.0</Text>
+        <View style={[styles.version, StyleSheet.absoluteFill]}>
+            <Text style={[styles.versionText, {color: textColor}]}>NotepadAI v1.2 BETA</Text>
         </View>
     </View>
+    <ThemeChooseModal visible={themeChooseModalVisible} onClose={() => {setThemeChooseModalVisible(false)}}/>
+    </>
   )
 }
 
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 15,
-        backgroundColor: colors.LIGHT
     },
     statusBtns: {
         flexDirection: 'row',
@@ -117,9 +127,13 @@ const styles = StyleSheet.create({
     nameBlock: {
         paddingBottom: 48
     },
+    version: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        paddingBottom: 10
+    },
     versionText: {
-        top: 713,
-        left: 130,
         opacity: 0.5,
         fontWeight: 'bold'
     },
@@ -132,7 +146,6 @@ const styles = StyleSheet.create({
     avatar: {
         padding: 15,
         borderRadius: 40,
-        backgroundColor: colors.LIGHT_TIME,
     },
     name: {
         paddingLeft: 16,

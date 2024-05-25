@@ -2,8 +2,12 @@ import { Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, Vi
 import React, { useEffect, useRef, useState } from 'react'
 import colors from '../misc/colors'
 import IconView from './Icon'
+import { useTheme } from '../context/NoteContext'
 
 export default function ExtraMenuModal({visible, onClose, color, onDelete, onChangeColor}) {
+
+    const {theme, backgroundColor, textColor, setCurrentColorNavBar} = useTheme();
+
     const [active, setActive] = useState(color)
     const [whiteOpacity, setWhiteOpacity] = useState(0.0)
     const [redOpacity, setRedOpacity] = useState(0.0)
@@ -48,7 +52,7 @@ export default function ExtraMenuModal({visible, onClose, color, onDelete, onCha
     
 
     useEffect(() => {
-        setColor(active)
+        setColor(active);
         // console.log(color)
     }, [])
 
@@ -59,22 +63,22 @@ export default function ExtraMenuModal({visible, onClose, color, onDelete, onCha
             <TouchableWithoutFeedback onPress={onClose}>
                 <View style={styles.header}/>
             </TouchableWithoutFeedback>
-            <View style={styles.modal}>
+            <View style={[styles.modal, {backgroundColor: backgroundColor}]}>
                 <View style={styles.container}>
                     <View style={styles.colorBlock}>
-                        <Text style={styles.colorText}>Цвет</Text>
+                        <Text style={[styles.colorText, {color: textColor}]}>Цвет</Text>
                         <View style={styles.colorPicker}>
                             <View style={[styles.activeColor, {borderWidth: whiteOpacity}]}>
-                                <TouchableOpacity style={[styles.roundPicker, {backgroundColor: colors.WHITE_LIGHT}]} onPress={() => {setColor('white')}}/>
+                                <TouchableOpacity style={[styles.roundPicker, {backgroundColor: (theme == "light") ? colors.WHITE_LIGHT : colors.DARK}]} onPress={() => {setColor('white')}}/>
                             </View>
                             <View style={[styles.activeColor, {borderWidth: redOpacity}]}>
-                                <TouchableOpacity style={[styles.roundPicker, {backgroundColor: colors.RED_LIGHT}]} onPress={() => {setColor('red')}}/>
+                                <TouchableOpacity style={[styles.roundPicker, {backgroundColor: (theme == "light") ? colors.RED_LIGHT : colors.RED}]} onPress={() => {setColor('red')}}/>
                             </View>
                             <View style={[styles.activeColor, {borderWidth: purpleOpacity}]}>
-                                <TouchableOpacity style={[styles.roundPicker, {backgroundColor: colors.PURPLE_LIGHT}]} onPress={() => {setColor('purple')}}/>
+                                <TouchableOpacity style={[styles.roundPicker, {backgroundColor: (theme == "light") ? colors.PURPLE_LIGHT : colors.PURPLE}]} onPress={() => {setColor('purple')}}/>
                             </View>
                             <View style={[styles.activeColor, {borderWidth: greenOpacity}]}>
-                                <TouchableOpacity style={[styles.roundPicker, {backgroundColor: colors.GREEN_LIGHT}]} onPress={() => {setColor('green')}}/>
+                                <TouchableOpacity style={[styles.roundPicker, {backgroundColor: (theme == "light") ? colors.GREEN_LIGHT : colors.GREEN_CARD_DARK}]} onPress={() => {setColor('green')}}/>
                             </View>
                             <View style={[styles.activeColor, {borderWidth: yellowOpacity}]}>
                                 <TouchableOpacity style={[styles.roundPicker, {backgroundColor: colors.YELLOW_LIGHT}]} onPress={() => {setColor('yellow')}}/>
@@ -102,11 +106,10 @@ const styles = StyleSheet.create({
     },
     modal: {
         minHeight: 200,
-        borderColor: colors.PLACEHOLDER,
-        borderWidth: 1,
+        borderColor: colors.GRAY,
+        borderWidth: 0.3,
         borderRadius: 20,
         borderBottomEndRadius: 0,
-        backgroundColor: colors.LIGHT
     },
     container: {
         padding: 16,

@@ -4,21 +4,27 @@ import { StatusBar } from 'expo-status-bar'
 import colors from '../misc/colors'
 import RoundIconBtn from '../components/RoundIconBtn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useTheme } from '../context/NoteContext'
 
 export default function Intro({onComplete, navigation}) {
     const [name, setName] = useState("")
     
+    const {theme, backgroundColor, textColor} = useTheme();
+
     const handleSubmit = async () => {
         const user = {name: name}
         await AsyncStorage.setItem('user', JSON.stringify(user))
-        if (onComplete) onComplete()
+        if (onComplete) {
+            onComplete();
+            navigation.navigate("NotesScreen");
+        };
+        
     }
   return (
     <>
-        <StatusBar />
-        <View style={styles.container}>
-            <Text style={styles.inputTitle}>Введите своё имя, чтобы продолжить</Text>
-            <TextInput value={name} onChangeText={(text) => setName(text)} placeholder="Введите имя" style={styles.textInput}/>
+        <View style={[styles.container, {backgroundColor: backgroundColor}]}>
+            <Text style={[styles.inputTitle, {color: textColor}]}>Введите своё имя, чтобы продолжить</Text>
+            <TextInput value={name} onChangeText={(text) => setName(text)} placeholder="Введите имя" style={[styles.textInput, {color: textColor}]}/>
             {name.trim().length >= 3 ? (<RoundIconBtn IconName="arrow-right" onPress={handleSubmit} />) : null}
         </View>
     </>

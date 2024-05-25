@@ -3,6 +3,7 @@ export default {
     TEXT: '#5e5e5e',
     LIGHT: '#FFFFFF',
     PRIMARY: '#f74f4f',
+    STROKE: '#EFEEF0',
     PEACH: '#f4b158',
     PINK: '#f4768e',
     BLUE: '#0184de',
@@ -19,11 +20,28 @@ export default {
 
     LIGHT_TIME: '#EFEEF0',
     YELLOW_TIME: '#F8C715',
+    YELLOW_TIME_DARK: '#fddd48',
     YELLOW_CARD: '#FDEBAB',
+    YELLOW_CARD_DARK: '#ffcc00',
     RED_CARD: '#F7DEE3',
+    RED_CARD_DARK: '#FF3B3B',
     RED_TIME: '#CE3A54',
+    RED_TIME_DARK: '#FF5C5C',
     PURPLE_CARD: '#EFE9F7',
+    PURPLE_CARD_DARK: '#6600cc',
     PURPLE_TIME: '#6A3EA1',
+    PURPLE_TIME_DARK: '#9800EF',
     GREEN_CARD: '#DAF6E4',
-    GREEN_TIME: '#60D889'
+    GREEN_CARD_DARK: '#06c270',
+    GREEN_TIME: '#60D889',
+    GREEN_TIME_DARK: '#39d98a',
+
+    TEXT_DARK: '#e7e7e7',
+    PRIMARY_DARK: '#121212',
+    SECONDARY_DARK: '#3a3a3a',
+    GRAY: '#a9a9a9',
+    SEARCH_BG_DARK: '#1f1f1f',
+    SEARCH_TEXT_DARK: '#818181',
+    BLACK_CARD: '#1A1A1A',
+    GRAY_TIME: '#827D89'
 }
