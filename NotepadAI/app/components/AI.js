@@ -20,9 +20,13 @@ async function askAI(messages) {
     let response = null
     console.log("Asked AI " + messages[1].content)
     const data = {
-        model: 'openchat/openchat-3.5-1210',
+        model: 'meta-llama/Llama-3-8b-chat-hf',
         max_tokens: 5095,
-        messages: messages
+        messages: messages,
+        temperature: 0.7,
+        top_p: 0.7,
+        top_k: 50,
+        repetition_penalty: 1,
     };
 
     const options = {
