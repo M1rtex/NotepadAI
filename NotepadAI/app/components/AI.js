@@ -30,7 +30,6 @@ async function askAI(messages) {
         headers,
         body: JSON.stringify(data)
     };
-
     await fetch(url, options)
         .then(response => response.json())
         .then(result => {
