@@ -12,7 +12,7 @@ import { TransitionPresets } from '@react-navigation/stack';
 
 import NoteDetail from './app/screens/NoteDetail';
 import colors from './app/misc/colors';
-import { NoteContext, ThemeContext } from './app/context/NoteContext';
+import { NoteContext, ThemeContext, UserContext } from './app/context/NoteContext';
 import NoteInputScreen from './app/screens/NoteInputScreen';
 import SettingsScreen from './app/screens/SettingsScreen';
 import {setBackgroundColorAsync} from 'expo-navigation-bar';
@@ -96,6 +96,7 @@ export default function App() {
         <NavigationContainer theme={DarkTheme}>
           <ThemeContext.Provider value={{theme, setTheme, backgroundColor, textColor, setCurrentColorNavBar}}>
           <NoteContext.Provider value={{notes, setNotes, findNotes}}>
+          <UserContext.Provider value={{findUser}}>
           <View style={[{backgroundColor: backgroundColor}, StyleSheet.absoluteFill]}>
             <Stack.Navigator screenOptions={{headerTitle: '', headerTransparent: true, headerShown: false}}>
               <Stack.Screen name='NotesScreen'>
@@ -115,6 +116,7 @@ export default function App() {
               </Stack.Screen>
             </Stack.Navigator>
           </View>
+          </UserContext.Provider>
           </NoteContext.Provider>
           </ThemeContext.Provider>
         </NavigationContainer>

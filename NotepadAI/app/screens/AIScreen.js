@@ -17,6 +17,11 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit, setL
     const [ask_theme, setAskTheme] = useState("");
     const [tone, setTone] = useState("");
     const [Tstyle, setTStyle] = useState("");
+    const [GenerateErrorVisible, setGenerateErrorVisible] = useState(false)
+
+    const changeGenerateErrorVisible = () => {
+        setGenerateErrorVisible(true)
+    }
 
 
     const translateChoses = [
@@ -44,6 +49,7 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit, setL
 
     const onExit = () => {
         setHeaderHeight(351);
+        setGenerateErrorVisible(false);
         setHintEnable(true);
         setLang("");
         setTStyle("");
@@ -139,14 +145,17 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit, setL
                     <Text style={{color: textColor, paddingBottom: 10}}>{(hintEnable)? "Параметры:" : null}</Text>
                     {(Prompt == "Normalize" | Prompt == "Summarise") ? <Text style={[styles.paramText, {color: textColor}]}>Данные готовы к отправке!</Text>: null}
                     {(Prompt == "Translate") ? <SelectList search={false} dropdownTextStyles={{color: textColor}} inputStyles={{color: textColor}} placeholder='Выберите язык' setSelected={(k) => setLang(k)} data={translateChoses} save="key"/>: null}
-                    {(Prompt == "Generate") ? <TextInput placeholder={"Введите тему"} onChangeText={onThemeFieldChange} style={[styles.input, {backgroundColor: (theme == "light") ? colors.SEARCH : colors.SEARCH_BG_DARK, color: textColor}]} placeholderTextColor={textColor}/>: null}
+                    {(Prompt == "Generate") ? <>
+                    <TextInput placeholder={"Введите тему"} onChangeText={onThemeFieldChange} style={[styles.input, {backgroundColor: (theme == "light") ? colors.SEARCH : colors.SEARCH_BG_DARK, color: textColor}]} placeholderTextColor={textColor}/>
+                    <Text style={{color: colors.ERROR, opacity: (GenerateErrorVisible) ? 0.8 : 0}}>Введите тему для генерации!</Text>
+                    </>: null}
                     {(Prompt == "Refactor") ? <>
                     <SelectList search={false} dropdownTextStyles={{color: textColor}} inputStyles={{color: textColor}} placeholder='Выберите тон' setSelected={(v) => setTone(v)} data={tonsChoses} save="value"/>
                     <View style={{height: 5}}/>
                     <SelectList search={false} dropdownTextStyles={{color: textColor}} inputStyles={{color: textColor}} placeholder='Выберите стиль' setSelected={(v) => setTStyle(v)} data={TstyleChoses} save="value"/>
                     </>
                     : null}
-                    <TouchableOpacity onPress={onRequest}>
+                    <TouchableOpacity onPress={(Prompt == "Generate" & ask_theme.length != 0) ? onRequest : changeGenerateErrorVisible }>
                         <View style={styles.funcBlock}>
                             <IconView IconName='paper-plane' size={25} type='FontAwesome5' theme={theme}/>
                             <Text style={[styles.funcText, {color: textColor}]}>Запрос</Text>

@@ -18,8 +18,8 @@ export default function Intro({onComplete, navigation}) {
             onComplete();
             navigation.navigate("NotesScreen");
         };
-        
     }
+    
   return (
     <>
         <View style={[styles.container, {backgroundColor: backgroundColor}]}>
