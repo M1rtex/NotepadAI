@@ -60,8 +60,8 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit, setL
     }
     
     const onRequest = async () => {
-        setLoading(true);
         if (accept) {
+            setLoading(true);
             let SysPrompt = ``
             let request = `${desc}`
             if (Prompt == "Normalize") {
@@ -155,7 +155,7 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit, setL
                     <SelectList search={false} dropdownTextStyles={{color: textColor}} inputStyles={{color: textColor}} placeholder='Выберите стиль' setSelected={(v) => setTStyle(v)} data={TstyleChoses} save="value"/>
                     </>
                     : null}
-                    <TouchableOpacity onPress={(Prompt == "Generate" & ask_theme.length != 0) ? onRequest : changeGenerateErrorVisible }>
+                    <TouchableOpacity onPress={onRequest}>
                         <View style={styles.funcBlock}>
                             <IconView IconName='paper-plane' size={25} type='FontAwesome5' theme={theme}/>
                             <Text style={[styles.funcText, {color: textColor}]}>Запрос</Text>
