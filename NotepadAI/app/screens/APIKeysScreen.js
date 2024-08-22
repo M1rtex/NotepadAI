@@ -65,11 +65,11 @@ export default function APIKeysScreen(props) {
         {"Будьте внимательны!\nНеверный API ключ приведёт к потере функционала!"}
         </Text>
         <View style={[styles.keyBlock, {marginBottom: 15}]}>
-            <Text style={styles.headerText}>Google API Key</Text>
+            <Text style={[styles.headerText, {color: textColor}]}>Google API Key</Text>
             <TextInput secureTextEntry={isKeyGoogleSecured} value={google} onChangeText={setGoogle} onPressIn={() => {setIsKeyGoogleSecured(false)}} style={[styles.textInput, {color: textColor, borderColor: (theme == 'light') ? colors.PLACEHOLDER : colors.GRAY_TIME}]}></TextInput>
         </View>
         <View style={styles.keyBlock}>
-            <Text style={styles.headerText}>TogetherAI API Key</Text>
+            <Text style={[styles.headerText, {color: textColor}]}>TogetherAI API Key</Text>
             <TextInput secureTextEntry={isKeyTogetherSecured} value={together} onChangeText={setTogether} onPressIn={() => {setIsKeyTogetherSecured(false)}} style={[styles.textInput, {color: textColor, borderColor: (theme == 'light') ? colors.PLACEHOLDER : colors.GRAY_TIME}]}></TextInput>
         </View>
         <View style={[styles.saveBlock, StyleSheet.absoluteFill]}>

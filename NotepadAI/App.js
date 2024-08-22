@@ -43,9 +43,11 @@ export default function App() {
 
       const saveAPIs = async (Google, Together) => {
         let newAPIs = {}
-        if (Google != null) newAPIs["Google"] = Google
-        if (Together != null) newAPIs["Together"] = Together
-        console.log(newAPIs)
+        if (Google != null) newAPIs["Google"] = Google;
+        if (Together != null) newAPIs["Together"] = Together;
+        setGoogleAPIKey(Google);
+        setTogetherAPIKey(Together);
+        console.log(newAPIs);
         await AsyncStorage.setItem('apis', JSON.stringify(newAPIs));
       }
       
