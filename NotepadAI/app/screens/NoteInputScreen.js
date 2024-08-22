@@ -104,7 +104,8 @@ export default function NoteInputScreen(props) {
       };
 
     const onOCR = (text, language) => {
-        setDesc(desc + `\n[OCR:${language}]\n` + text)
+        if (language) { setDesc(desc + `\n[OCR:${language}]\n` + text) }
+        else { setDesc(desc + `\n[ОШИБКА]\n` + text) }
         console.log("Text addeed")
     }
 

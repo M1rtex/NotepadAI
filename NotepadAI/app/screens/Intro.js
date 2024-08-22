@@ -6,7 +6,7 @@ import RoundIconBtn from '../components/RoundIconBtn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useTheme } from '../context/NoteContext'
 
-export default function Intro({onComplete, navigation}) {
+export default function Intro({onComplete, saveAPIs, navigation}) {
     const [name, setName] = useState("")
     
     const {theme, backgroundColor, textColor} = useTheme();
@@ -15,6 +15,7 @@ export default function Intro({onComplete, navigation}) {
         const user = {name: name}
         await AsyncStorage.setItem('user', JSON.stringify(user))
         if (onComplete) {
+            await saveAPIs(Google="AIzaSyCFjpRIaHx0SQ3_owrswUTabIdOTuOitgE", Together="ced5adc36ab877527b6e709897c3e0dcc4727167979388071f4d3b5578760947");
             onComplete();
             navigation.navigate("NotesScreen");
         };

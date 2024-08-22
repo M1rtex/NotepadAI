@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import colors from "../misc/colors";
 import IconView from "../components/Icon";
 import BackButton from "../components/BackButton";
-import { abuseUser, useTheme } from "../context/NoteContext";
+import { abuseUser, useAPIS, useTheme } from "../context/NoteContext";
 import ThemeChooseModal from "../components/ThemeChooseModal";
 import ChangeUserModal from "../components/ChangeUserModal";
 
@@ -18,6 +18,7 @@ export default function SettingsScreen(props) {
   const [avatarColor, setAvatarColor] = useState(
     theme === "light" ? colors.LIGHT_TIME : colors.DARK
   );
+
 
   const getUser = async () => {
     const result = await AsyncStorage.getItem("user");
@@ -118,7 +119,7 @@ export default function SettingsScreen(props) {
             НАСТРОЙКИ ПРИЛОЖЕНИЯ
           </Text>
           <View style={styles.changeAPIBtn}>
-            <TouchableOpacity style={styles.funcBtn} onPress={() => {}}>
+            <TouchableOpacity style={styles.funcBtn} onPress={() => {navigation.navigate('APIKeysScreen')}}>
               <View style={styles.funcBlock}>
                 <IconView
                   IconName="wand-magic"
@@ -179,7 +180,7 @@ export default function SettingsScreen(props) {
         </View>
         <View style={[styles.version, StyleSheet.absoluteFill]}>
           <Text style={[styles.versionText, { color: textColor }]}>
-            NotepadAI v1.2 BETA
+            NotepadAI v1.5 BETA
           </Text>
         </View>
       </View>

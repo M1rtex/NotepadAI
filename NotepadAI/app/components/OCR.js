@@ -4,23 +4,26 @@ import callGoogleVisionAsync from './GoogleVision.js';
 import * as ImagePicker from 'expo-image-picker';
 import IconView from './Icon.js';
 import colors from '../misc/colors.js';
+import { useAPIS } from '../context/NoteContext.js';
 
 export default function OCR({onResult, setLoading, setLoadingType, theme}) {
     const [language, setLanguage] = useState(null);
     const [text, setText] = useState(null);
+    const {GoogleAPIKey} = useAPIS();
 
     const getText = async (image) => {
         let resp = null
-        await callGoogleVisionAsync(image).then(data=>{
+        await callGoogleVisionAsync(image, API_KEY=GoogleAPIKey).then(data=>{
         var txt = ""
         var locale = ""
+        if (data.responses) {
         data.responses.forEach((response) => {
             if (response.fullTextAnnotation) {
                 txt = response.fullTextAnnotation.text;
                 locale = response.textAnnotations[0].locale;
-                console.log(locale, txt);
             }
         });
+        }
         setLanguage(locale);
         setText(txt);
         console.log(language, text);
@@ -57,9 +60,12 @@ export default function OCR({onResult, setLoading, setLoadingType, theme}) {
                 setLoading(true);
                 await getText(image).then((data) => {
                     console.log(data)
-                    if (data) {
+                    if (!data.error) {
                         onResult(data.text, data.locale)
                         setLoading(false)
+                    } else {
+                      onRequest(data.error)
+                      setLoading(false)
                     }
                 })
             }

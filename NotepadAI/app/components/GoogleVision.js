@@ -1,5 +1,3 @@
-const API_KEY = 'AIzaSyCFjpRIaHx0SQ3_owrswUTabIdOTuOitgE'; 
-const API_URL = `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`;
 
 // Also try DOCUMENT_TEXT_DETECTION instead of TEXT_DETECTION as per https://cloud.google.com/vision/docs/ocr
 function generateBody(image) {
@@ -21,7 +19,8 @@ function generateBody(image) {
   return body;
 }
 
-async function callGoogleVisionAsync(image) {
+async function callGoogleVisionAsync(image, API_KEY) {
+    const API_URL = `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`;
     return new Promise(async(resolve, reject) => {
         const body = generateBody(image); //pass in our image for the payload
         const response = await fetch(API_URL, {
@@ -33,7 +32,7 @@ async function callGoogleVisionAsync(image) {
         body: JSON.stringify(body),
         });
         response.json().then((res)=>{
-            resolve(res)
+            resolve(res);
         }).catch((error)=>{
             reject(error)
         })
