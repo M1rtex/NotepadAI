@@ -4,12 +4,12 @@ import colors from '../misc/colors'
 import { SelectList } from 'react-native-dropdown-select-list'
 import askAI, {NormalizeTextPrompt, TranslateTextPrompt, RefactorTextPrompt, GenerateTextPrompt, SummariseTextPrompt} from '../components/AI'
 import IconView from '../components/Icon'
-import { useTheme } from '../context/NoteContext'
+import { useAPIS, useTheme } from '../context/NoteContext'
 
 export default function AIScreen({visible, onClose, Prompt, desc, onSubmit, setLoading}) {
 
     const {theme, backgroundColor, textColor} = useTheme();
-
+    const {GoogleAPIKey, TogetherAPIKey} = useAPIS();
     const [lang, setLang] = useState("");
     const [headerHeight, setHeaderHeight] = useState(351);
     const [hintEnable, setHintEnable] = useState(true);
@@ -97,14 +97,21 @@ export default function AIScreen({visible, onClose, Prompt, desc, onSubmit, setL
                 }
             ]
             onExit();
-            await askAI(messages=messages).then((response) => {
-                let ans = response.Result.choices[0].message.content
-                if (ans) {
-                    console.log(ans)
-                    if (Prompt == "Generate") {
-                        onSubmit(ans, request)
+            await askAI(messages=messages, apikey=TogetherAPIKey).then((response) => {
+                console.log(response)
+                if (!response.Result.error) {
+                    let ans = response.Result.choices[0].message.content
+                    if (ans != undefined) {
+                        console.log(ans)
+                        if (Prompt == "Generate") {
+                            onSubmit(ans, request)
+                        }
+                        onSubmit(ans, null)
+                        setLoading(false);
                     }
-                    onSubmit(ans, null)
+                } else {
+                    let error = response.Result.error.message;
+                    onSubmit(error, null);
                     setLoading(false);
                 }
             })

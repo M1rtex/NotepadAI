@@ -4,18 +4,15 @@ import Intro from './app/screens/Intro';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NotesScreen from './app/screens/NotesScreen';
-import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import { TransitionSpecs, CardStyleInterpolators } from "@react-navigation/stack";
-import { TransitionPresets } from '@react-navigation/stack';
-
 import NoteDetail from './app/screens/NoteDetail';
 import colors from './app/misc/colors';
-import { NoteContext, ThemeContext, UserContext } from './app/context/NoteContext';
+import { APISContext, NoteContext, ThemeContext, UserContext } from './app/context/NoteContext';
 import NoteInputScreen from './app/screens/NoteInputScreen';
 import SettingsScreen from './app/screens/SettingsScreen';
 import {setBackgroundColorAsync} from 'expo-navigation-bar';
+import APIKeysScreen from './app/screens/APIKeysScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -29,12 +26,38 @@ export default function App() {
       (theme == "light") ? setBackgroundColorAsync(colors.LIGHT) : setBackgroundColorAsync(colors.PRIMARY_DARK);
       const [backgroundColor, setBackgroundColor] = useState((theme === 'light') ? colors.LIGHT: colors.PRIMARY_DARK);
       const [textColor, setTextColor] = useState((theme === 'light') ? colors.TEXT: colors.TEXT_DARK);
+      const [GoogleAPIKey, setGoogleAPIKey] = useState('');
+      const [TogetherAPIKey, setTogetherAPIKey] = useState('');
+      // TODO realize api keys DB
 
+      // {"Google": "key"; "Together": "key"}
+      const findAPIs = async () => {
+        const result = await AsyncStorage.getItem('apis');
+        if (result !== null) {
+          let res = JSON.parse(result);
+          console.log(res);
+          setGoogleAPIKey(res["Google"]);
+          setTogetherAPIKey(res["Together"]);
+        }
+      };
+
+      const saveAPIs = async (Google, Together) => {
+        let newAPIs = {}
+        if (Google != null) newAPIs["Google"] = Google;
+        if (Together != null) newAPIs["Together"] = Together;
+        setGoogleAPIKey(Google);
+        setTogetherAPIKey(Together);
+        console.log(newAPIs);
+        await AsyncStorage.setItem('apis', JSON.stringify(newAPIs));
+      }
+      
+      // [{note}, {note} ... ]
       const findNotes = async () => {
         const result = await AsyncStorage.getItem('notes');
         if (result !== null) setNotes(JSON.parse(result));
       };
 
+      // "username"
       const findUser = async () => {
         const result = await AsyncStorage.getItem('user');
         if (result) {
@@ -79,6 +102,7 @@ export default function App() {
       useEffect(() => {
         if (isFirstTime) {
           setIsFirstTime(false);
+          findAPIs();
           getThemeDB().then((themeDB) => {
             const db_theme = themeDB
             if (db_theme == undefined) {
@@ -93,8 +117,9 @@ export default function App() {
       }, []);
 
     return (
-        <NavigationContainer theme={DarkTheme}>
+        <NavigationContainer>
           <ThemeContext.Provider value={{theme, setTheme, backgroundColor, textColor, setCurrentColorNavBar}}>
+          <APISContext.Provider value={{GoogleAPIKey, setGoogleAPIKey, TogetherAPIKey, setTogetherAPIKey, saveAPIs}}>
           <NoteContext.Provider value={{notes, setNotes, findNotes}}>
           <UserContext.Provider value={{findUser}}>
           <View style={[{backgroundColor: backgroundColor}, StyleSheet.absoluteFill]}>
@@ -103,7 +128,7 @@ export default function App() {
                 {(props) => <NotesScreen {...props} user={user} />}
               </Stack.Screen>
               <Stack.Screen name='IntroScreen'>
-                {(props) => <Intro {...props} onComplete={findUser} />}
+                {(props) => <Intro {...props} onComplete={findUser} saveAPIs={saveAPIs} />}
               </Stack.Screen>
               <Stack.Screen name='NoteDetail'>
                 {(props) => <NoteDetail {...props}  />}
@@ -114,10 +139,14 @@ export default function App() {
               <Stack.Screen name='Settings'>
                 {(props) => <SettingsScreen {...props} />}
               </Stack.Screen>
+              <Stack.Screen name='APIKeysScreen'>
+                {(props) => <APIKeysScreen {...props} />}
+              </Stack.Screen>
             </Stack.Navigator>
           </View>
           </UserContext.Provider>
           </NoteContext.Provider>
+          </APISContext.Provider>
           </ThemeContext.Provider>
         </NavigationContainer>
     );
